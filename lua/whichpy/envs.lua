@@ -157,7 +157,7 @@ M.retrieve_cache = function()
   local filename = vim.fn.getcwd():gsub("/", "%%")
   local f = io.open(vim.fs.joinpath(config.cache_dir, filename), "r")
   if not f then
-    require("whichpy.util").notify_info("No cache with current working directory.")
+    require("whichpy.util").notify_info("No cache.")
     return
   end
   local interpreter_path = f:read()
