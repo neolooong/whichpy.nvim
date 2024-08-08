@@ -1,18 +1,19 @@
+local async = require("whichpy.async")
 local config = require("whichpy.config").config
 local _envs = {}
 local orig_envvar
 local curr_env_info
 local searching_status = "NOT_STARTED"
+local _show_on_complete = false
 
 local M = {}
 
 ---@param notify_on_complete boolean
-M.search = function(notify_on_complete)
-  notify_on_complete = notify_on_complete or false
+M.asearch = function(notify_on_complete)
+  async.run(function()
+    if searching_status == "NOT_STARTED" or searching_status == "DONE" then
+      searching_status = "IN_PROGRESS"
 
-  if searching_status == "NOT_STARTED" or searching_status == "DONE" then
-    searching_status = "IN_PROGRESS"
-    vim.schedule(function()
       local envs = {}
       for locator_name, _ in pairs(config.locator) do
         local locator = require("whichpy.locator")[locator_name]
@@ -35,11 +36,22 @@ M.search = function(notify_on_complete)
 
       _envs = envs
       searching_status = "DONE"
-      if notify_on_complete then
+    end
+  end, function()
+    if notify_on_complete then
+      vim.schedule(function()
         require("whichpy.util").notify_info("Search completed.")
-      end
-    end)
-  end
+      end)
+    end
+    if _show_on_complete then
+      _show_on_complete = false
+      vim.ui.select(_envs, { prompt = "Select Python Interpreter" }, function(choice)
+        if choice ~= nil then
+          M.handle_select(choice)
+        end
+      end)
+    end
+  end)
 end
 
 M.get_envs = function()
@@ -51,19 +63,7 @@ end
 
 M.show_selector = function()
   if searching_status ~= "DONE" then
-    local timer = assert(vim.uv.new_timer())
-    timer:start(100, 100, function()
-      if searching_status == "DONE" then
-        timer:close()
-        vim.schedule_wrap(function()
-          vim.ui.select(_envs, { prompt = "Select Python Interpreter" }, function(choice)
-            if choice ~= nil then
-              M.handle_select(choice)
-            end
-          end)
-        end)()
-      end
-    end)
+    _show_on_complete = true
     return
   end
   vim.ui.select(_envs, { prompt = "Select Python Interpreter" }, function(choice)

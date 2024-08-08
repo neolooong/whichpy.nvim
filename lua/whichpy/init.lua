@@ -13,7 +13,7 @@ M.setup = function(opts)
     end
   end
 
-  require("whichpy.envs").search(false)
+  require("whichpy.envs").asearch(true)
 
   -- Create User Command
   require("whichpy.usercmd").create_user_cmd()

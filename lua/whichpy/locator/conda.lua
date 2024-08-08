@@ -1,11 +1,11 @@
 local is_win = vim.uv.os_uname().sysname == "Windows_NT"
 local bin_scripts = (is_win and "Scripts") or "bin"
 local filename = (is_win and "python.exe") or "python"
+local asystem = require("whichpy.async").asystem
 
 local get_conda_info = function()
-  local ok, res = pcall(function()
-    return vim.system({ "conda", "info", "--json" }):wait()
-  end)
+  local ok, res = asystem({ "conda", "info", "--json" }, {})
+
   if ok and res.code == 0 then
     return vim.json.decode(res.stdout)
   end
@@ -17,8 +17,9 @@ end
 
 return {
   find = function()
+    local conda_info = get_conda_info()
+
     return coroutine.wrap(function()
-      local conda_info = get_conda_info()
       if not conda_info then
         return
       end
