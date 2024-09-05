@@ -29,7 +29,7 @@ local common_posix_bin_paths = {
 }
 
 local get_pyenv_shims_dir = function()
-  local pyenv_root = is_win and os.getenv("PYENV_ROOT") or os.getenv("PYENV")
+  local pyenv_root = is_win and os.getenv("PYENV") or os.getenv("PYENV_ROOT")
   if pyenv_root == nil or pyenv_root == "" then
     pyenv_root = is_win and vim.fs.joinpath(os.getenv("USERPROFILE"), ".pyenv", "pyenv-win")
       or vim.fs.joinpath(os.getenv("HOME"), ".pyenv")

@@ -3,7 +3,7 @@ local bin_scripts = (is_win and "Scripts") or "bin"
 local filename = (is_win and "python.exe") or "python"
 
 local get_pyenv_version_dir = function()
-  local pyenv_root = is_win and os.getenv("PYENV_ROOT") or os.getenv("PYENV")
+  local pyenv_root = is_win and os.getenv("PYENV") or os.getenv("PYENV_ROOT")
   if pyenv_root == nil or pyenv_root == "" then
     pyenv_root = is_win and vim.fs.joinpath(os.getenv("USERPROFILE"), ".pyenv", "pyenv-win")
       or vim.fs.joinpath(os.getenv("HOME"), ".pyenv")
