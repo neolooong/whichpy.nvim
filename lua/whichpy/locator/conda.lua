@@ -7,7 +7,7 @@ local get_conda_info = function()
   local ok, res = asystem({ "conda", "info", "--json" }, {})
 
   if ok and res.code == 0 then
-    return vim.json.decode(res.stdout)
+    return res.stdout
   end
 end
 
