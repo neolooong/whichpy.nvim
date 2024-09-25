@@ -36,7 +36,14 @@ function M.wrap(func)
     local cb_idx = table.maxn(args)
     local cb = args[cb_idx]
     args[cb_idx] = function(...)
-      cb(true, ...)
+      if vim.in_fast_event() then
+        args = {...}
+        vim.schedule(function ()
+          cb(true, unpack(args))
+        end)
+      else
+        cb(true, ...)
+      end
     end
     xpcall(func, function(err)
       -- nested xpcall causes coroutine hangs if another error is thrown inside the error handler.
