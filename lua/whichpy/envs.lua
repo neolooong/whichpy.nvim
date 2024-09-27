@@ -110,7 +110,7 @@ M.handle_select = function(env_info, should_cache)
   -- cache
   if should_cache then
     vim.fn.mkdir(config.cache_dir, "p")
-    local filename = vim.fn.getcwd():gsub("/", "%%")
+    local filename = vim.fn.getcwd():gsub("[\\/:]+", "%%")
     local f = assert(io.open(vim.fs.joinpath(config.cache_dir, filename), "wb"))
     f:write(env_info.interpreter_path)
     f:close()
