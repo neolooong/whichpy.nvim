@@ -1,6 +1,4 @@
-local is_win = vim.uv.os_uname().sysname == "Windows_NT"
-local bin_scripts = (is_win and "Scripts") or "bin"
-local filename = (is_win and "python.exe") or "python"
+local get_interpreter_path = require("whichpy.util").get_interpreter_path
 local M = {
   pylsp = {},
   pyright = {},
@@ -11,7 +9,7 @@ local M = {
 ---@return string
 M.find_python_path = function(workspace)
   if vim.env.VIRTUAL_ENV then
-    return vim.fs.joinpath(vim.env.VIRTUAL_ENV, bin_scripts, filename)
+    return get_interpreter_path(vim.env.VIRTUAL_ENV, "bin")
   end
 
   if workspace and vim.fn.filereadable(vim.fs.joinpath(workspace, "poetry.lock")) then
@@ -19,7 +17,7 @@ M.find_python_path = function(workspace)
       return vim.system({ "poetry", "env", "info", "-p" }):wait()
     end)
     if ok and res.code == 0 then
-      return vim.fs.joinpath(vim.trim(res.stdout), bin_scripts, filename)
+      return get_interpreter_path(vim.trim(res.stdout), "bin")
     end
   end
 
@@ -33,7 +31,7 @@ M.find_python_path = function(workspace)
         :wait()
     end)
     if ok and res.code == 0 then
-      return vim.fs.joinpath(vim.trim(res.stdout), bin_scripts, filename)
+      return get_interpreter_path(vim.trim(res.stdout), "bin")
     end
   end
 

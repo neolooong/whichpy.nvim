@@ -1,6 +1,6 @@
 local util = require("whichpy.util")
 local is_win = vim.uv.os_uname().sysname == "Windows_NT"
-local filename = (is_win and "python.exe") or "python"
+local get_interpreter_path = require("whichpy.util").get_interpreter_path
 
 local common_posix_bin_paths = {
   "/bin",
@@ -62,7 +62,7 @@ return {
       local dirs = util.deduplicate(get_search_path_entries())
 
       for _, dir in ipairs(dirs) do
-        local interpreter_path = vim.fs.joinpath(dir, filename)
+        local interpreter_path = get_interpreter_path(dir, "root")
         if vim.uv.fs_stat(interpreter_path) then
           coroutine.yield(interpreter_path)
         end

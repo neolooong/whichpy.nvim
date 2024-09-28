@@ -1,6 +1,5 @@
 local is_win = vim.uv.os_uname().sysname == "Windows_NT"
-local bin_scripts = (is_win and "Scripts") or "bin"
-local filename = (is_win and "python.exe") or "python"
+local get_interpreter_path = require("whichpy.util").get_interpreter_path
 
 local get_pyenv_version_dir = function()
   local pyenv_root = is_win and os.getenv("PYENV") or os.getenv("PYENV_ROOT")
@@ -19,7 +18,7 @@ return {
 
       for name, t in vim.fs.dir(dir) do
         if t == "directory" then
-          local interpreter_path = vim.fs.joinpath(dir, name, bin_scripts, filename)
+          local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
           if vim.uv.fs_stat(interpreter_path) then
             coroutine.yield(interpreter_path)
 
@@ -28,7 +27,7 @@ return {
             ---@diagnostic disable-next-line: redefined-local
             for name, t in vim.fs.dir(envs_dir) do
               if t == "directory" then
-                interpreter_path = vim.fs.joinpath(envs_dir, name, bin_scripts, filename)
+                interpreter_path = get_interpreter_path(vim.fs.joinpath(envs_dir, name), "bin")
                 if vim.uv.fs_stat(interpreter_path) then
                   coroutine.yield(interpreter_path)
                 end

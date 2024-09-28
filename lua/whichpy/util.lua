@@ -1,3 +1,7 @@
+local is_win = vim.uv.os_uname().sysname == "Windows_NT"
+local bin_scripts = (is_win and "Scripts") or "bin"
+local filename = (is_win and "python.exe") or "python"
+
 local M = {}
 
 M._notify = function(msg, lvl)
@@ -28,6 +32,13 @@ M.deduplicate = function(tbl)
     end
   end
   return unique_tbl
+end
+
+---@param dir string
+---@param case "root" | "bin"
+---@return string
+M.get_interpreter_path = function(dir, case)
+  return vim.fs.joinpath(dir, case == "root" and "" or bin_scripts, filename)
 end
 
 return M
