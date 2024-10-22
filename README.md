@@ -1,7 +1,6 @@
 # whichpy.nvim
 
-Yet another python interpreter selector plugin for neovim. Make LSPs (pyright, pylsp, basedpyright) and `dap-python` work with specific python.
-
+Yet another python interpreter selector plugin for neovim. Make LSPs (pyright, pylsp, basedpyright) work with specific python.
 
 
 https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
@@ -10,7 +9,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
 
 ## Features
 
-- Only `nvim-lspconfig` required. `dap-python` is optional.
+- Only `nvim-lspconfig` required.
 - Use `vim.ui.select`. Enable dressing.nvim to get powerful UI.
 - Support Pylsp, Pyright, BasedPyright LSP servers by default. Other LSP server can be supported with simple config.
 - Switch between python interpreters without restart LSPs. (Except `WhichPy restore` on Pyright)
@@ -94,15 +93,15 @@ This plugin provide these commands:
 
 - `:WhichPy select [path?]`
 
-  If `path` provided, LSPs and dap-python would be configured. Otherwise, selector prompt (through `vim.ui.select`) would show up.
+  If `path` provided, LSPs would be configured. Otherwise, selector prompt (through `vim.ui.select`) would show up.
 
 - `:WhichPy restore`
 
-  Restore LSPs and dap-python configuration, and clear the cache.
+  Restore LSPs configuration, and clear the cache.
 
 - `:WhichPy retrieve`
 
-  Retrieve the interpreter path from cache, then configure lsp and dap-python.
+  Retrieve the interpreter path from cache, then configure lsp.
 
 - `:WhichPy rescan`
 
@@ -113,12 +112,12 @@ This plugin provide these commands:
 <details>
   <summary>How this plugin activate environment?</summary>
 
-  This plugin **DOES NOT *activate*** environment (`source env/bin/activate` or `conda activate`). The purpose of the plugin is to make LSPs and dap-python work with the specified python.
+  This plugin **DOES NOT *activate*** environment (`source env/bin/activate` or `conda activate`). The purpose of the plugin is to make LSPs work with the specified python.
   
   When path selected, this plugin do these things:
   
   1. Save the environment variables: `VIRTUAL_ENV` and `CONDA_PREFIX`.
-  2. Unset `VIRTUAL_ENV` and `CONDA_PREFIX` then set the `resolve_python()` of dap-python.
+  2. Unset `VIRTUAL_ENV` and `CONDA_PREFIX`.
   3. Iterate lsp clients, save the python path that current used (if any), before update the configuration.
   
 </details>

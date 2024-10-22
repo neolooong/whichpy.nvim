@@ -88,13 +88,6 @@ M.handle_select = function(env_info, should_cache)
   vim.env.VIRTUAL_ENV = nil
   vim.env.CONDA_PREFIX = nil
 
-  -- dap
-  pcall(function()
-    require("dap-python").resolve_python = function()
-      return env_info.interpreter_path
-    end
-  end)
-
   -- lsp
   for lsp_name, obj in pairs(config.lsp) do
     local pp_getter, pp_setter = unpack(obj)
@@ -130,11 +123,6 @@ M.handle_restore = function()
   -- $VIRTUAL_ENV, $CONDA_PREFIX
   vim.env.VIRTUAL_ENV = orig_envvar.VIRTUAL_ENV
   vim.env.CONDA_PREFIX = orig_envvar.CONDA_PREFIX
-
-  -- dap
-  pcall(function()
-    require("dap-python").resolve_python = nil
-  end)
 
   -- lsp
   for lsp_name, obj in pairs(config.lsp) do
