@@ -38,10 +38,9 @@ local M = {}
 
 M.setup_config = function(opts)
   M.config = vim.tbl_deep_extend("force", _default_config, opts or {})
-  for locator, locator_opts in pairs(M.config.locator) do
-    if locator_opts.enable == false then
-      M.config.locator[locator] = nil
-    end
+
+  for locator_name, locator_opts in pairs(M.config.locator) do
+    require("whichpy.locator").setup_locator(locator_name, locator_opts)
   end
 end
 

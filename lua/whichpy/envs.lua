@@ -1,5 +1,6 @@
 local async = require("whichpy.async")
 local config = require("whichpy.config").config
+local locator = require("whichpy.locator")
 local _envs = {}
 local orig_envvar
 local curr_env_info
@@ -15,24 +16,18 @@ M.asearch = function(notify_on_complete)
       searching_status = "IN_PROGRESS"
 
       local envs = {}
-      for locator_name, _ in pairs(config.locator) do
-        local locator = require("whichpy.locator")[locator_name]
-        if locator ~= nil then
-          for interpreter_path in locator.find() do
-            local env_info = locator.resolve(interpreter_path)
-            setmetatable(env_info, {
-              __tostring = function(info)
-                return string.format(
-                  "(%s) %s",
-                  info.locator,
-                  vim.fn.fnamemodify(info.interpreter_path, ":p:~:.")
-                )
-              end,
-            })
-            table.insert(envs, env_info)
-          end
-        end
-      end
+      locator.iterate(function(env_info)
+        setmetatable(env_info, {
+          __tostring = function(info)
+            return string.format(
+              "(%s) %s",
+              info.locator,
+              vim.fn.fnamemodify(info.interpreter_path, ":p:~:.")
+            )
+          end,
+        })
+        table.insert(envs, env_info)
+      end)
 
       _envs = envs
       searching_status = "DONE"
