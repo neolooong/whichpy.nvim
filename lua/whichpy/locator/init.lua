@@ -1,22 +1,42 @@
-local M = {}
+---@class Locator
+---@field find fun(): async fun()
+---@field resolve fun(interpreter_path: string): InterpreterInfo
+---@field merge_opts? fun(opts: table)
 
+---@class InterpreterInfo
+---@field locator string name of the locator
+---@field interpreter_path string
+
+---@type table<string, Locator>
 local locators = {}
+
+local M = {}
+setmetatable(M, {
+  __index = function(_, key)
+    local ok, locator = pcall(require, "whichpy.locator." .. key)
+    if ok then
+      return locator
+    end
+  end,
+})
 
 ---@param locator_name string
 ---@param locator_opts table
 M.setup_locator = function(locator_name, locator_opts)
-  local ok, locator = pcall(require, "whichpy.locator." .. locator_name)
-  if not ok then
-    require("whichpy.util").notify_error(locator_name .. " isn't a definded locator.")
-    return
-  end
   if locator_opts.enable == false then
     return
   end
+
+  ---@type Locator?
+  local locator = M[locator_name]
+  if not locator then
+    return
+  end
+
   if locator.merge_opts then
     locator.merge_opts(locator_opts)
   end
-  table.insert(locators, locator)
+  locators[locator_name] = locator
 end
 
 ---@param on_result function
