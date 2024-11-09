@@ -15,6 +15,7 @@
 ---@class (exact) WhichPy.Config.Locator.Workspace
 ---@field search_pattern? string
 ---@field depth? integer
+---@field ignore_dirs? string[]
 
 ---@class (exact) WhichPy.Config.Locator.Global
 
@@ -36,6 +37,14 @@ local _default_config = {
     workspace = {
       search_pattern = ".*env.*",
       depth = 2,
+      ignore_dirs = {
+        ".git",
+        ".mypy_cache",
+        ".pytest_cache",
+        ".ruff_cache",
+        "__pycache__",
+        "__pypackages__",
+      },
     },
     global = {},
     global_virtual_environment = {

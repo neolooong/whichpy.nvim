@@ -20,10 +20,12 @@ return {
           if t == "directory" then
             local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
 
-            if name:match(_opts.search_pattern) and vim.uv.fs_stat(interpreter_path) then
-              coroutine.yield(interpreter_path)
-            elseif depth < _opts.depth then
-              dirs[#dirs + 1] = { vim.fs.joinpath(dir, name), depth + 1 }
+            if not vim.list_contains(_opts.ignore_dirs, name) then
+              if name:match(_opts.search_pattern) and vim.uv.fs_stat(interpreter_path) then
+                coroutine.yield(interpreter_path)
+              elseif depth < _opts.depth then
+                dirs[#dirs + 1] = { vim.fs.joinpath(dir, name), depth + 1 }
+              end
             end
           end
         end

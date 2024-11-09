@@ -47,6 +47,14 @@ return {
       workspace = {
         search_pattern = ".*env.*", -- `:help lua-patterns`
         depth = 2,
+        ignore_dirs = {
+          ".git",
+          ".mypy_cache",
+          ".pytest_cache",
+          ".ruff_cache",
+          "__pycache__",
+          "__pypackages__",
+        },
       },
       global = {},
       global_virtual_environment = {
