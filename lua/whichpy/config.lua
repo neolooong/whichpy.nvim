@@ -45,7 +45,7 @@ local _default_config = {
         "~/.venvs",
         "~/.virtualenvs",
         "~/.local/share/virtualenvs",
-        { "~/Envs", "Linux" },
+        { "~/Envs", "Windows_NT" },
         vim.env.WORKON_HOME,
       },
     },

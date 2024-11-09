@@ -59,7 +59,7 @@ return {
           "~/.venvs",
           "~/.virtualenvs",
           "~/.local/share/virtualenvs",
-          { "~/Envs", "Linux" },  -- only search on linux
+          { "~/Envs", "Windows_NT" },  -- only search on Windows
           vim.env.WORKON_HOME,
         }
       },
