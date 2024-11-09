@@ -1,7 +1,7 @@
 ---@class (exact) WhichPy.Config
 ---@field cache_dir? string
 ---@field locator? WhichPy.Config.Locator
----@field lsp? table<string,{[1]: fun(), [2]: fun()}>
+---@field lsp? table<table,WhichPy.Lsp.Handler>
 
 ---@class (exact) WhichPy.Config.Locator
 ---@field workspace? WhichPy.Config.Locator.Workspace
@@ -55,14 +55,9 @@ local _default_config = {
     conda = {},
   },
   lsp = {
-    pylsp = {
-      require("whichpy.lsp").pylsp.python_path_getter,
-      require("whichpy.lsp").pylsp.python_path_setter,
-    },
-    pyright = {
-      require("whichpy.lsp").pyright.python_path_getter,
-      require("whichpy.lsp").pyright.python_path_setter,
-    },
+    pylsp = require("whichpy.lsp").handlers.pylsp,
+    pyright = require("whichpy.lsp").handlers.pyright,
+    basedpyright = require("whichpy.lsp").handlers.pyright,
   },
 }
 

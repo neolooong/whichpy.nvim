@@ -84,14 +84,13 @@ M.handle_select = function(env_info, should_cache)
   vim.env.CONDA_PREFIX = nil
 
   -- lsp
-  for lsp_name, obj in pairs(config.lsp) do
-    local pp_getter, pp_setter = unpack(obj)
+  for lsp_name, handler in pairs(config.lsp) do
     local client = vim.lsp.get_clients({ name = lsp_name })[1]
     if client then
       if not selected then
-        _orig_envvar["lsp"][lsp_name] = pp_getter(client)
+        _orig_envvar["lsp"][lsp_name] = handler.get_python_path(client)
       end
-      pp_setter(client, env_info.interpreter_path)
+      handler.set_python_path(client, env_info.interpreter_path)
     end
   end
 
@@ -120,11 +119,10 @@ M.handle_restore = function()
   vim.env.CONDA_PREFIX = orig_envvar.CONDA_PREFIX
 
   -- lsp
-  for lsp_name, obj in pairs(config.lsp) do
-    local _, pp_setter = unpack(obj)
+  for lsp_name, handler in pairs(config.lsp) do
     local client = vim.lsp.get_clients({ name = lsp_name })[1]
     if client then
-      pp_setter(client, orig_envvar.lsp[client])
+      handler.set_python_path(client, orig_envvar.lsp[client])
     end
   end
 

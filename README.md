@@ -69,19 +69,9 @@ return {
       conda = {},
     },
     lsp = {
-      -- lsp_name = { path_getter() , path_setter() }
-      pylsp = {
-        require("whichpy.lsp").pylsp.python_path_getter,
-        require("whichpy.lsp").pylsp.python_path_setter,
-      },
-      pyright = {
-        require("whichpy.lsp").pyright.python_path_getter,
-        require("whichpy.lsp").pyright.python_path_setter,
-      },
-      basedpyright = {
-        require("whichpy.lsp").pyright.python_path_getter,
-        require("whichpy.lsp").pyright.python_path_setter,
-      },
+      pylsp = require("whichpy.lsp").handlers.pylsp,
+      pyright = require("whichpy.lsp").handlers.pyright,
+      basedpyright = require("whichpy.lsp").handlers.pyright,
     },
   }
   ```
