@@ -1,7 +1,7 @@
 ---@class (exact) WhichPy.Config
 ---@field cache_dir? string
 ---@field locator? WhichPy.Config.Locator
----@field lsp? table<table,WhichPy.Lsp.Handler>
+---@field lsp? table<string,WhichPy.Lsp.Handler>
 
 ---@class (exact) WhichPy.Config.Locator
 ---@field workspace? WhichPy.Config.Locator.Workspace
