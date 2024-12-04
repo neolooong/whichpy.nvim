@@ -4,34 +4,34 @@ local locator = require("whichpy.locator")
 local _envs = {}
 local orig_envvar
 local curr_env_info
-local searching_status = "NOT_STARTED"
+local search_co
 local _show_on_complete = false
 
 local M = {}
 
 ---@param notify_on_complete boolean
 M.asearch = function(notify_on_complete)
+  if search_co ~= nil and coroutine.status(search_co) ~= "dead" then
+    return
+  end
   async.run(function()
-    if searching_status == "NOT_STARTED" or searching_status == "DONE" then
-      searching_status = "IN_PROGRESS"
+    search_co = coroutine.running()
 
-      local envs = {}
-      locator.iterate(function(env_info)
-        setmetatable(env_info, {
-          __tostring = function(info)
-            return string.format(
-              "(%s) %s",
-              info.locator,
-              vim.fn.fnamemodify(info.interpreter_path, ":p:~:.")
-            )
-          end,
-        })
-        table.insert(envs, env_info)
-      end)
+    local envs = {}
+    locator.iterate(function(env_info)
+      setmetatable(env_info, {
+        __tostring = function(info)
+          return string.format(
+            "(%s) %s",
+            info.locator,
+            vim.fn.fnamemodify(info.interpreter_path, ":p:~:.")
+          )
+        end,
+      })
+      table.insert(envs, env_info)
+    end)
 
-      _envs = envs
-      searching_status = "DONE"
-    end
+    _envs = envs
   end, function()
     if notify_on_complete then
       vim.schedule(function()
@@ -50,22 +50,25 @@ M.asearch = function(notify_on_complete)
 end
 
 M.get_envs = function()
-  if searching_status == "DONE" then
+  if coroutine.status(search_co) == "dead" then
     return _envs
   end
   return {}
 end
 
 M.show_selector = function()
-  if searching_status ~= "DONE" then
+  if search_co == nil then
     _show_on_complete = true
-    return
+    M.asearch(false)
+  elseif coroutine.status(search_co) ~= "dead" then
+    _show_on_complete = true
+  else
+    vim.ui.select(_envs, { prompt = "Select Python Interpreter" }, function(choice)
+      if choice ~= nil then
+        M.handle_select(choice)
+      end
+    end)
   end
-  vim.ui.select(_envs, { prompt = "Select Python Interpreter" }, function(choice)
-    if choice ~= nil then
-      M.handle_select(choice)
-    end
-  end)
 end
 
 M.handle_select = function(env_info, should_cache)
