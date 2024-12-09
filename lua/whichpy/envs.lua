@@ -5,7 +5,7 @@ local _envs = {}
 local orig_envvar
 local curr_env_info
 local search_co
-local _show_on_complete = false
+local _show_ui_callback
 
 local M = {}
 
@@ -38,13 +38,8 @@ M.asearch = function(notify_on_complete)
         require("whichpy.util").notify_info("Search completed.")
       end)
     end
-    if _show_on_complete then
-      _show_on_complete = false
-      vim.ui.select(_envs, { prompt = "Select Python Interpreter" }, function(choice)
-        if choice ~= nil then
-          M.handle_select(choice)
-        end
-      end)
+    if _show_ui_callback then
+      _show_ui_callback()
     end
   end)
 end
@@ -57,17 +52,21 @@ M.get_envs = function()
 end
 
 M.show_selector = function()
-  if search_co == nil then
-    _show_on_complete = true
-    M.asearch(false)
-  elseif coroutine.status(search_co) ~= "dead" then
-    _show_on_complete = true
-  else
+  local function show_ui()
     vim.ui.select(_envs, { prompt = "Select Python Interpreter" }, function(choice)
       if choice ~= nil then
         M.handle_select(choice)
       end
     end)
+  end
+
+  if search_co == nil then
+    _show_ui_callback = show_ui
+    M.asearch(false)
+  elseif coroutine.status(search_co) ~= "dead" then
+    _show_ui_callback = show_ui
+  else
+    show_ui()
   end
 end
 
