@@ -41,4 +41,9 @@ M.get_interpreter_path = function(dir, case)
   return vim.fs.joinpath(dir, case == "root" and "" or bin_scripts, filename)
 end
 
+---@param plugin "fzf-lua"
+M.is_support = function (plugin)
+  return pcall(require, plugin)
+end
+
 return M

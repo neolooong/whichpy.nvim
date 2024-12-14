@@ -12,7 +12,7 @@ local subcommand_tbl = {
         if not vim.uv.fs_stat(python_path) then
           require("whichpy.util").notify_info(python_path .. " doesn't exists.")
         else
-          require("whichpy.envs").handle_select({ interpreter_path = python_path })
+          require("whichpy.envs").handle_select(python_path)
         end
       end
     end,
@@ -56,7 +56,7 @@ local subcommand_tbl = {
       if #opts.fargs > 1 then
         vim.notify("Too many arguments", vim.log.levels.ERROR)
       else
-        require("whichpy.envs").asearch(true)
+        require("whichpy.envs").asearch()
       end
     end,
   },
