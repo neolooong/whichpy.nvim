@@ -4,7 +4,7 @@ local locator = require("whichpy.locator")
 local SearchJob = require("whichpy.search")
 local temp_envs = {}
 local final_envs = {}
-local orig_envvar
+local orig_interpreter_path
 local curr_interpreter_path
 local search_co
 
@@ -177,26 +177,20 @@ M.show_selector = function()
 end
 
 M.handle_select = function(interpreter_path, should_cache)
-  local selected = orig_envvar ~= nil
-  local _orig_envvar = {}
+  local selected = orig_interpreter_path ~= nil
+  local _orig_interpreter_path = {}
   should_cache = should_cache == nil or should_cache
 
   if not selected then
-    _orig_envvar["lsp"] = {}
-    _orig_envvar["VIRTUAL_ENV"] = vim.env.VIRTUAL_ENV
-    _orig_envvar["CONDA_PREFIX"] = vim.env.CONDA_PREFIX
+    _orig_interpreter_path["lsp"] = {}
   end
-
-  -- $VIRTUAL_ENV, $CONDA_PREFIX
-  vim.env.VIRTUAL_ENV = nil
-  vim.env.CONDA_PREFIX = nil
 
   -- lsp
   for lsp_name, handler in pairs(config.lsp) do
     local client = vim.lsp.get_clients({ name = lsp_name })[1]
     if client then
       if not selected then
-        _orig_envvar["lsp"][lsp_name] = handler.get_python_path(client)
+        _orig_interpreter_path["lsp"][lsp_name] = handler.get_python_path(client)
       end
       handler.set_python_path(client, interpreter_path)
     end
@@ -212,25 +206,21 @@ M.handle_select = function(interpreter_path, should_cache)
   end
 
   if not selected then
-    orig_envvar = _orig_envvar
+    orig_interpreter_path = _orig_interpreter_path
   end
   curr_interpreter_path = interpreter_path
 end
 
 M.handle_restore = function()
-  if orig_envvar == nil then
+  if orig_interpreter_path == nil then
     return
   end
-
-  -- $VIRTUAL_ENV, $CONDA_PREFIX
-  vim.env.VIRTUAL_ENV = orig_envvar.VIRTUAL_ENV
-  vim.env.CONDA_PREFIX = orig_envvar.CONDA_PREFIX
 
   -- lsp
   for lsp_name, handler in pairs(config.lsp) do
     local client = vim.lsp.get_clients({ name = lsp_name })[1]
     if client then
-      handler.set_python_path(client, orig_envvar.lsp[client])
+      handler.set_python_path(client, orig_interpreter_path.lsp[client])
     end
   end
 
@@ -238,7 +228,7 @@ M.handle_restore = function()
   local filename = vim.fn.getcwd():gsub("/", "%%")
   os.remove(vim.fs.joinpath(config.cache_dir, filename))
 
-  orig_envvar = nil
+  orig_interpreter_path = nil
   curr_interpreter_path = nil
 end
 
