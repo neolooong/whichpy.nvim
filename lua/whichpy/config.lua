@@ -2,7 +2,7 @@
 ---@field cache_dir? string
 ---@field locator? WhichPy.Config.Locator
 ---@field lsp? table<string,WhichPy.Lsp.Handler>
----@field picker? "builtin" | "fzf-lua"
+---@field picker? "builtin" | "fzf-lua" | "telescope"
 
 ---@class (exact) WhichPy.Config.Locator
 ---@field workspace? WhichPy.Config.Locator.Workspace
