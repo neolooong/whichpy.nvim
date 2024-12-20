@@ -8,13 +8,12 @@ local SearchJob = {
   on_finish = function() end,
 }
 
----@param self table
----@return "dead"|"normal"|"running"|"suspended"?
-SearchJob.status = function(self)
+---@return "dead"|"normal"|"running"|"suspended"|nil
+function SearchJob:status()
   return (self.co and coroutine.status(self.co)) or nil
 end
 
-SearchJob.start = function(self)
+function SearchJob:start()
   if self.co ~= nil and self.status(self) ~= "dead" then
     return
   end
@@ -38,7 +37,7 @@ SearchJob.start = function(self)
   end)
 end
 
-SearchJob.update_hook = function(self, on_result, on_finish)
+function SearchJob:update_hook(on_result, on_finish)
   self.on_result = on_result or function(_) end
   self.on_finish = on_finish or function() end
 end

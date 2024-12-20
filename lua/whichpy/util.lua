@@ -22,6 +22,10 @@ M.notify_error = function(msg)
   M._notify(msg, vim.log.levels.ERROR)
 end
 
+M.notify_warn = function(msg)
+  M._notify(msg, vim.log.levels.WARN)
+end
+
 M.deduplicate = function(tbl)
   local hash = {}
   local unique_tbl = {}
