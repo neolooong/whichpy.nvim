@@ -1,42 +1,10 @@
-local async = require("whichpy.async")
 local config = require("whichpy.config").config
-local locator = require("whichpy.locator")
 local SearchJob = require("whichpy.search")
-local temp_envs = {}
 local final_envs = {}
 local orig_interpreter_path
 local curr_interpreter_path
-local search_co
 
 local M = {}
-
-M.base_asearch = function(on_result, on_finish)
-  if search_co ~= nil and coroutine.status(search_co) ~= "dead" then
-    return
-  end
-
-  local function _on_async_finish()
-    final_envs = temp_envs
-
-    if on_finish then
-      on_finish()
-    end
-    vim.schedule(function()
-      require("whichpy.util").notify_info("Search completed.")
-    end)
-  end
-
-  async.run(function()
-    search_co = coroutine.running()
-    temp_envs = {}
-    locator.iterate(function(env_info)
-      table.insert(temp_envs, env_info)
-      if on_result then
-        on_result(env_info)
-      end
-    end)
-  end, _on_async_finish)
-end
 
 M.asearch = function()
   SearchJob:start()
@@ -47,10 +15,10 @@ M.set_envs = function(envs)
 end
 
 M.get_envs = function()
-  if coroutine.status(search_co) == "dead" then
+  if SearchJob:status() == "dead" then
     return final_envs
   end
-  return temp_envs
+  return SearchJob:_temp_envs()
 end
 
 -- TODO: Improve readability by moving the picker into its own function?
