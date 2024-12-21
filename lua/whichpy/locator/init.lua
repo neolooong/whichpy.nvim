@@ -43,7 +43,16 @@ end
 M.iterate = function(on_result)
   for _, locator in pairs(locators) do
     for interpreter_path in locator.find() do
-      on_result(locator.resolve(interpreter_path))
+      local env_info = setmetatable(locator.resolve(interpreter_path), {
+        __tostring = function(t)
+          return string.format(
+            "(%s) %s",
+            t.locator,
+            vim.fn.fnamemodify(t.interpreter_path, ":p:~:.")
+          )
+        end,
+      })
+      on_result(env_info)
     end
   end
 end

@@ -22,6 +22,10 @@ M.notify_error = function(msg)
   M._notify(msg, vim.log.levels.ERROR)
 end
 
+M.notify_warn = function(msg)
+  M._notify(msg, vim.log.levels.WARN)
+end
+
 M.deduplicate = function(tbl)
   local hash = {}
   local unique_tbl = {}
@@ -39,6 +43,11 @@ end
 ---@return string
 M.get_interpreter_path = function(dir, case)
   return vim.fs.joinpath(dir, case == "root" and "" or bin_scripts, filename)
+end
+
+---@param plugin "fzf-lua"|"telescope"
+M.is_support = function(plugin)
+  return pcall(require, plugin)
 end
 
 return M

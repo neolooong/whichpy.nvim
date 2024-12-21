@@ -1,99 +1,47 @@
-local async = require("whichpy.async")
 local config = require("whichpy.config").config
-local locator = require("whichpy.locator")
-local _envs = {}
-local orig_envvar
-local curr_env_info
-local search_co
-local _show_on_complete = false
+local SearchJob = require("whichpy.search")
+local final_envs = {}
+local orig_interpreter_path
+local curr_interpreter_path
 
 local M = {}
 
----@param notify_on_complete boolean
-M.asearch = function(notify_on_complete)
-  if search_co ~= nil and coroutine.status(search_co) ~= "dead" then
-    return
-  end
-  async.run(function()
-    search_co = coroutine.running()
+M.asearch = function()
+  SearchJob:start()
+end
 
-    local envs = {}
-    locator.iterate(function(env_info)
-      setmetatable(env_info, {
-        __tostring = function(info)
-          return string.format(
-            "(%s) %s",
-            info.locator,
-            vim.fn.fnamemodify(info.interpreter_path, ":p:~:.")
-          )
-        end,
-      })
-      table.insert(envs, env_info)
-    end)
-
-    _envs = envs
-  end, function()
-    if notify_on_complete then
-      vim.schedule(function()
-        require("whichpy.util").notify_info("Search completed.")
-      end)
-    end
-    if _show_on_complete then
-      _show_on_complete = false
-      vim.ui.select(_envs, { prompt = "Select Python Interpreter" }, function(choice)
-        if choice ~= nil then
-          M.handle_select(choice)
-        end
-      end)
-    end
-  end)
+M.set_envs = function(envs)
+  final_envs = envs
 end
 
 M.get_envs = function()
-  if coroutine.status(search_co) == "dead" then
-    return _envs
+  if SearchJob:status() == "dead" then
+    return final_envs
   end
-  return {}
+  return SearchJob:_temp_envs()
 end
 
 M.show_selector = function()
-  if search_co == nil then
-    _show_on_complete = true
-    M.asearch(false)
-  elseif coroutine.status(search_co) ~= "dead" then
-    _show_on_complete = true
-  else
-    vim.ui.select(_envs, { prompt = "Select Python Interpreter" }, function(choice)
-      if choice ~= nil then
-        M.handle_select(choice)
-      end
-    end)
-  end
+  require("whichpy.picker")[config.picker.name]:show()
 end
 
-M.handle_select = function(env_info, should_cache)
-  local selected = orig_envvar ~= nil
-  local _orig_envvar = {}
+M.handle_select = function(interpreter_path, should_cache)
+  local selected = orig_interpreter_path ~= nil
+  local _orig_interpreter_path = {}
   should_cache = should_cache == nil or should_cache
 
   if not selected then
-    _orig_envvar["lsp"] = {}
-    _orig_envvar["VIRTUAL_ENV"] = vim.env.VIRTUAL_ENV
-    _orig_envvar["CONDA_PREFIX"] = vim.env.CONDA_PREFIX
+    _orig_interpreter_path["lsp"] = {}
   end
-
-  -- $VIRTUAL_ENV, $CONDA_PREFIX
-  vim.env.VIRTUAL_ENV = nil
-  vim.env.CONDA_PREFIX = nil
 
   -- lsp
   for lsp_name, handler in pairs(config.lsp) do
     local client = vim.lsp.get_clients({ name = lsp_name })[1]
     if client then
       if not selected then
-        _orig_envvar["lsp"][lsp_name] = handler.get_python_path(client)
+        _orig_interpreter_path["lsp"][lsp_name] = handler.get_python_path(client)
       end
-      handler.set_python_path(client, env_info.interpreter_path)
+      handler.set_python_path(client, interpreter_path)
     end
   end
 
@@ -102,30 +50,26 @@ M.handle_select = function(env_info, should_cache)
     vim.fn.mkdir(config.cache_dir, "p")
     local filename = vim.fn.getcwd():gsub("[\\/:]+", "%%")
     local f = assert(io.open(vim.fs.joinpath(config.cache_dir, filename), "wb"))
-    f:write(env_info.interpreter_path)
+    f:write(interpreter_path)
     f:close()
   end
 
   if not selected then
-    orig_envvar = _orig_envvar
+    orig_interpreter_path = _orig_interpreter_path
   end
-  curr_env_info = env_info
+  curr_interpreter_path = interpreter_path
 end
 
 M.handle_restore = function()
-  if orig_envvar == nil then
+  if orig_interpreter_path == nil then
     return
   end
-
-  -- $VIRTUAL_ENV, $CONDA_PREFIX
-  vim.env.VIRTUAL_ENV = orig_envvar.VIRTUAL_ENV
-  vim.env.CONDA_PREFIX = orig_envvar.CONDA_PREFIX
 
   -- lsp
   for lsp_name, handler in pairs(config.lsp) do
     local client = vim.lsp.get_clients({ name = lsp_name })[1]
     if client then
-      handler.set_python_path(client, orig_envvar.lsp[client])
+      handler.set_python_path(client, orig_interpreter_path.lsp[client])
     end
   end
 
@@ -133,8 +77,8 @@ M.handle_restore = function()
   local filename = vim.fn.getcwd():gsub("/", "%%")
   os.remove(vim.fs.joinpath(config.cache_dir, filename))
 
-  orig_envvar = nil
-  curr_env_info = nil
+  orig_interpreter_path = nil
+  curr_interpreter_path = nil
 end
 
 M.retrieve_cache = function()
@@ -147,11 +91,11 @@ M.retrieve_cache = function()
   local interpreter_path = f:read()
   f:close()
 
-  M.handle_select({ interpreter_path = interpreter_path }, false)
+  M.handle_select(interpreter_path, false)
 end
 
 M.current_selected = function()
-  return curr_env_info
+  return curr_interpreter_path
 end
 
 return M
