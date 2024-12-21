@@ -15,7 +15,7 @@ local get_global_virtual_environment_dirs = function()
       end
     end
   end
-  return dirs
+  return require("whichpy.util").deduplicate(dirs)
 end
 
 return {
