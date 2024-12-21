@@ -38,4 +38,5 @@ function Picker:show()
   end
 end
 
+---@type WhichPy.Picker
 return Picker

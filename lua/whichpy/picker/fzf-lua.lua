@@ -62,4 +62,5 @@ function Picker:show()
   require("fzf-lua").fzf_exec(self._fzf_contents, opts)
 end
 
+---@type WhichPy.Picker
 return Picker

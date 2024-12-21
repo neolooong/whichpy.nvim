@@ -73,4 +73,5 @@ function Picker:show()
   picker:find()
 end
 
+---@type WhichPy.Picker
 return Picker
