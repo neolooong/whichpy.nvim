@@ -32,6 +32,7 @@ M.handle_select = function(interpreter_path, should_cache)
 
   if not selected then
     _orig_interpreter_path["lsp"] = {}
+    _orig_interpreter_path["dap"] = {}
   end
 
   -- lsp
@@ -42,6 +43,17 @@ M.handle_select = function(interpreter_path, should_cache)
         _orig_interpreter_path["lsp"][lsp_name] = handler.get_python_path(client)
       end
       handler.set_python_path(client, interpreter_path)
+    end
+  end
+
+  -- dap
+  local ok, dap_python = pcall(require, "dap-python")
+  if ok then
+    if not selected then
+      _orig_interpreter_path["dap"] = dap_python.resolve_python
+    end
+    dap_python.resolve_python = function()
+      return interpreter_path
     end
   end
 
@@ -71,6 +83,12 @@ M.handle_restore = function()
     if client then
       handler.set_python_path(client, orig_interpreter_path.lsp[client])
     end
+  end
+
+  -- dap
+  local ok, dap_python = pcall(require, "dap-python")
+  if ok then
+    dap_python.resolve_python = orig_interpreter_path.dap
   end
 
   -- cache
