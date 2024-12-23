@@ -1,4 +1,5 @@
 local config = require("whichpy.config").config
+local util = require("whichpy.util").util
 local SearchJob = require("whichpy.search")
 local final_envs = {}
 local orig_interpreter_path
@@ -103,7 +104,7 @@ M.retrieve_cache = function()
   local filename = vim.fn.getcwd():gsub("/", "%%")
   local f = io.open(vim.fs.joinpath(config.cache_dir, filename), "r")
   if not f then
-    require("whichpy.util").notify_info("No cache.")
+    util.notify("No cache.")
     return
   end
   local interpreter_path = f:read()

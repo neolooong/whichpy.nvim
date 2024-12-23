@@ -1,5 +1,6 @@
 local async = require("whichpy.async")
 local locator = require("whichpy.locator")
+local util = require("whichpy.util")
 
 local SearchJob = {
   co = nil,
@@ -29,7 +30,7 @@ function SearchJob:start()
     end)
   end, function()
     vim.schedule(function()
-      require("whichpy.util").notify_info("Search completed.")
+      util.notify("Search completed.")
     end)
     require("whichpy.envs").set_envs(self._temp_envs)
     self.on_finish()

@@ -1,4 +1,5 @@
-local get_interpreter_path = require("whichpy.util").get_interpreter_path
+local util = require("whichpy.util")
+local get_interpreter_path = util.get_interpreter_path
 
 local _opts = {}
 
@@ -15,7 +16,7 @@ local get_global_virtual_environment_dirs = function()
       end
     end
   end
-  return require("whichpy.util").deduplicate(dirs)
+  return util.deduplicate(dirs)
 end
 
 return {

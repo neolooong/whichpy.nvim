@@ -1,6 +1,6 @@
 local util = require("whichpy.util")
 local is_win = vim.uv.os_uname().sysname == "Windows_NT"
-local get_interpreter_path = require("whichpy.util").get_interpreter_path
+local get_interpreter_path = util.get_interpreter_path
 
 local common_posix_bin_paths = {
   "/bin",

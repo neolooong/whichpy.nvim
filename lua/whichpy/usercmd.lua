@@ -1,3 +1,5 @@
+local util = require("whichpy.util")
+
 local M = {}
 
 local subcommand_tbl = {
@@ -10,7 +12,7 @@ local subcommand_tbl = {
       else
         local python_path = opts.fargs[2]
         if not vim.uv.fs_stat(python_path) then
-          require("whichpy.util").notify_info(python_path .. " doesn't exists.")
+          util.notify(python_path .. " doesn't exists.")
         else
           require("whichpy.envs").handle_select(python_path)
         end
@@ -30,7 +32,7 @@ local subcommand_tbl = {
           return env:find(subcmd_arg_lead)
         end)
         :totable()
-      return require("whichpy.util").deduplicate(envs)
+      return util.deduplicate(envs)
     end,
   },
   restore = {

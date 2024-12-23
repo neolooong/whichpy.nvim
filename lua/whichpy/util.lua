@@ -4,26 +4,28 @@ local filename = (is_win and "python.exe") or "python"
 
 local M = {}
 
-M._notify = function(msg, lvl)
-  vim.notify(msg, lvl, {
-    -- rcarriga/nvim-notify
-    title = "whichpy",
+---@class (exact) WhichPy.NotifyOpt
+---@field once boolean|nil defaults to false
+---@field level integer|nil defaults to vim.log.levels.INFO
 
-    -- j-hui/fidget.nvim
-    annote = "whichpy",
+---@param msg string
+---@param opts? WhichPy.NotifyOpt
+M.notify = function(msg, opts)
+  local notify_func = vim.notify
+  local level = vim.log.levels.INFO
+  opts = vim.tbl_deep_extend("force", opts or {}, {
+    title = "whichpy", -- rcarriga/nvim-notify
+    annote = "whichpy", -- j-hui/fidget.nvim
   })
-end
-
-M.notify_info = function(msg)
-  M._notify(msg, vim.log.levels.INFO)
-end
-
-M.notify_error = function(msg)
-  M._notify(msg, vim.log.levels.ERROR)
-end
-
-M.notify_warn = function(msg)
-  M._notify(msg, vim.log.levels.WARN)
+  if opts.once then
+    notify_func = vim.notify_once
+    opts.once = nil
+  end
+  if not opts.level then
+    level = opts.level
+    opts.level = nil
+  end
+  notify_func(msg, level, opts)
 end
 
 M.deduplicate = function(tbl)
