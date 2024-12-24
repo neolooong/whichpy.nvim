@@ -21,6 +21,10 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
   - pdm
   - conda
 
+## Requirements
+
+- Neovim >= 0.10.0
+
 ## Installation
 
 - Using lazy.nvim:
@@ -62,7 +66,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
     },
     locator = {
       -- you can disable locator like this
-      -- locator = { enable = false },
+      -- locator_name = { enable = false },
       workspace = {
         search_pattern = ".*env.*", -- `:help lua-patterns`
         depth = 2,
@@ -184,14 +188,13 @@ This plugin provide these commands:
       "nvim-neotest/neotest-python",
     },
     config = function()
-      local get_python_command = require("neotest-python.base").get_python_command
       local python_adapter = require("neotest-python")({
         python = function()
           local whichpy_python = require("whichpy.envs").current_selected()
           if whichpy_python then
             return whichpy_python
           end
-          return get_python_command()
+          return require("neotest-python.base").get_python_command
         end,
       })
       require("neotest").setup({
