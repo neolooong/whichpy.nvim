@@ -87,8 +87,11 @@ M.handlers.pyright = {
   set_python_path = function(client, python_path)
     if python_path then
       if vim.fn.has("nvim-0.9.0") == 1 then
-        client.config.settings =
-          vim.tbl_deep_extend("force", client.config.settings, { python = { pythonPath = python_path } })
+        client.config.settings = vim.tbl_deep_extend(
+          "force",
+          client.config.settings,
+          { python = { pythonPath = python_path } }
+        )
         client.notify("workspace/didChangeConfiguration", { settings = nil })
       else
         client.settings =
@@ -121,10 +124,7 @@ M.find_python_path = function(workspace)
   if workspace and vim.fn.filereadable(util.joinpath(workspace, "Pipfile")) then
     local ok, res = pcall(function()
       return vim
-        .system(
-          { "pipenv", "--venv" },
-          { env = { PIPENV_PIPFILE = util.joinpath(workspace, "Pipfile") } }
-        )
+        .system({ "pipenv", "--venv" }, { env = { PIPENV_PIPFILE = util.joinpath(workspace, "Pipfile") } })
         :wait()
     end)
     if ok and res.code == 0 then

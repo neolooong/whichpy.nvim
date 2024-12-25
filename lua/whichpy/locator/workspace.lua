@@ -22,7 +22,9 @@ return {
             local interpreter_path = get_interpreter_path(util.joinpath(dir, name), "bin")
 
             if not util.list_contains(_opts.ignore_dirs, name) then
-              if name:match(_opts.search_pattern) and (vim.uv or vim.loop).fs_stat(interpreter_path) then
+              if
+                name:match(_opts.search_pattern) and (vim.uv or vim.loop).fs_stat(interpreter_path)
+              then
                 coroutine.yield(interpreter_path)
               elseif depth < _opts.depth then
                 dirs[#dirs + 1] = { util.joinpath(dir, name), depth + 1 }
