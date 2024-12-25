@@ -45,15 +45,25 @@ local get_search_path_entries = function()
     dirs = vim.list_extend(dirs, common_posix_bin_paths)
   end
   local pyenv_shims = get_pyenv_shims_dir()
-  return vim
-    .iter(dirs)
-    :filter(function(dir)
-      return dir ~= pyenv_shims
-    end)
-    :map(function(dir)
-      return vim.fn.fnamemodify(dir, ":p")
-    end)
-    :totable()
+  if vim.iter then
+    return vim
+      .iter(dirs)
+      :filter(function(dir)
+        return dir ~= pyenv_shims
+      end)
+      :map(function(dir)
+        return vim.fn.fnamemodify(dir, ":p")
+      end)
+      :totable()
+  else
+    local _t = {}
+    for _, dir in ipairs(dirs) do
+      if dir ~= pyenv_shims then
+        table.insert(_t, vim.fn.fnamemodify(dir, ":p"))
+      end
+    end
+    return _t
+  end
 end
 
 return {
