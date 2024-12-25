@@ -6,7 +6,8 @@
 
 ---@class WhichPy.Lsp.PyrightHandler: WhichPy.Lsp.Handler
 
-local get_interpreter_path = require("whichpy.util").get_interpreter_path
+local util = require("whichpy.util")
+local get_interpreter_path = util.get_interpreter_path
 
 local M = {}
 
@@ -68,7 +69,7 @@ M.find_python_path = function(workspace)
     return get_interpreter_path(vim.env.VIRTUAL_ENV, "bin")
   end
 
-  if workspace and vim.fn.filereadable(vim.fs.joinpath(workspace, "poetry.lock")) then
+  if workspace and vim.fn.filereadable(util.joinpath(workspace, "poetry.lock")) then
     local ok, res = pcall(function()
       return vim.system({ "poetry", "env", "info", "-p" }):wait()
     end)
@@ -77,12 +78,12 @@ M.find_python_path = function(workspace)
     end
   end
 
-  if workspace and vim.fn.filereadable(vim.fs.joinpath(workspace, "Pipfile")) then
+  if workspace and vim.fn.filereadable(util.joinpath(workspace, "Pipfile")) then
     local ok, res = pcall(function()
       return vim
         .system(
           { "pipenv", "--venv" },
-          { env = { PIPENV_PIPFILE = vim.fs.joinpath(workspace, "Pipfile") } }
+          { env = { PIPENV_PIPFILE = util.joinpath(workspace, "Pipfile") } }
         )
         :wait()
     end)

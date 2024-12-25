@@ -1,3 +1,4 @@
+local util = require("whichpy.util")
 local get_interpreter_path = require("whichpy.util").get_interpreter_path
 local asystem = require("whichpy.async").asystem
 
@@ -19,7 +20,7 @@ return {
 
       for name, t in vim.fs.dir(dir) do
         if t == "directory" then
-          local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
+          local interpreter_path = get_interpreter_path(util.joinpath(dir, name), "bin")
           if (vim.uv or vim.loop).fs_stat(interpreter_path) then
             coroutine.yield(interpreter_path)
           end

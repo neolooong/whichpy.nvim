@@ -40,16 +40,37 @@ M.deduplicate = function(tbl)
   return unique_tbl
 end
 
+M.joinpath = function(...)
+  if vim.fs.joinpath then
+    return vim.fs.joinpath(...)
+  end
+  return (table.concat({ ... }, "/"):gsub("//+", "/"))
+end
+
 ---@param dir string
 ---@param case "root" | "bin"
 ---@return string
 M.get_interpreter_path = function(dir, case)
-  return vim.fs.joinpath(dir, case == "root" and "" or bin_scripts, filename)
+  return M.joinpath(dir, case == "root" and "" or bin_scripts, filename)
 end
 
 ---@param plugin "fzf-lua"|"telescope"
 M.is_support = function(plugin)
   return pcall(require, plugin)
+end
+
+M.list_contains = function(...)
+  if vim.list_contains then
+    vim.list_contains(...)
+  end
+  ---@diagnostic disable-next-line: unbalanced-assignments
+  local t, value = unpack({ ... })
+  for _, v in ipairs(t) do
+    if v == value then
+      return true
+    end
+  end
+  return false
 end
 
 return M

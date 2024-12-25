@@ -62,7 +62,7 @@ M.handle_select = function(interpreter_path, should_cache)
   if should_cache then
     vim.fn.mkdir(config.cache_dir, "p")
     local filename = vim.fn.getcwd():gsub("[\\/:]+", "%%")
-    local f = assert(io.open(vim.fs.joinpath(config.cache_dir, filename), "wb"))
+    local f = assert(io.open(util.joinpath(config.cache_dir, filename), "wb"))
     f:write(interpreter_path)
     f:close()
   end
@@ -94,7 +94,7 @@ M.handle_restore = function()
 
   -- cache
   local filename = vim.fn.getcwd():gsub("/", "%%")
-  os.remove(vim.fs.joinpath(config.cache_dir, filename))
+  os.remove(util.joinpath(config.cache_dir, filename))
 
   orig_interpreter_path = nil
   curr_interpreter_path = nil
@@ -102,7 +102,7 @@ end
 
 M.retrieve_cache = function()
   local filename = vim.fn.getcwd():gsub("/", "%%")
-  local f = io.open(vim.fs.joinpath(config.cache_dir, filename), "r")
+  local f = io.open(util.joinpath(config.cache_dir, filename), "r")
   if not f then
     util.notify("No cache.")
     return
