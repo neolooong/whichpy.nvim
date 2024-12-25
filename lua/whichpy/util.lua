@@ -1,4 +1,4 @@
-local is_win = vim.uv.os_uname().sysname == "Windows_NT"
+local is_win = (vim.uv or vim.loop).os_uname().sysname == "Windows_NT"
 local bin_scripts = (is_win and "Scripts") or "bin"
 local filename = (is_win and "python.exe") or "python"
 

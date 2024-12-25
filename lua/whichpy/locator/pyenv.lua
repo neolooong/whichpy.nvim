@@ -1,4 +1,4 @@
-local is_win = vim.uv.os_uname().sysname == "Windows_NT"
+local is_win = (vim.uv or vim.loop).os_uname().sysname == "Windows_NT"
 local get_interpreter_path = require("whichpy.util").get_interpreter_path
 
 local get_pyenv_version_dir = function()
@@ -19,7 +19,7 @@ return {
       for name, t in vim.fs.dir(dir) do
         if t == "directory" then
           local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
-          if vim.uv.fs_stat(interpreter_path) then
+          if (vim.uv or vim.loop).fs_stat(interpreter_path) then
             coroutine.yield(interpreter_path)
 
             local envs_dir = vim.fs.joinpath(dir, name, "envs")
@@ -28,7 +28,7 @@ return {
             for name, t in vim.fs.dir(envs_dir) do
               if t == "directory" then
                 interpreter_path = get_interpreter_path(vim.fs.joinpath(envs_dir, name), "bin")
-                if vim.uv.fs_stat(interpreter_path) then
+                if (vim.uv or vim.loop).fs_stat(interpreter_path) then
                   coroutine.yield(interpreter_path)
                 end
               end
