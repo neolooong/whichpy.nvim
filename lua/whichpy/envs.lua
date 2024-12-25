@@ -1,5 +1,5 @@
 local config = require("whichpy.config").config
-local util = require("whichpy.util").util
+local util = require("whichpy.util")
 local SearchJob = require("whichpy.search")
 local final_envs = {}
 local orig_interpreter_path
