@@ -38,7 +38,7 @@ M.handle_select = function(interpreter_path, should_cache)
 
   -- lsp
   for lsp_name, handler in pairs(config.lsp) do
-    local client = vim.lsp.get_clients({ name = lsp_name })[1]
+    local client = (vim.lsp.get_clients or vim.lsp.get_active_clients)({ name = lsp_name })[1]
     if client then
       if not selected then
         _orig_interpreter_path["lsp"][lsp_name] = handler.get_python_path(client)
@@ -80,7 +80,7 @@ M.handle_restore = function()
 
   -- lsp
   for lsp_name, handler in pairs(config.lsp) do
-    local client = vim.lsp.get_clients({ name = lsp_name })[1]
+    local client = (vim.lsp.get_clients or vim.lsp.get_active_clients)({ name = lsp_name })[1]
     if client then
       handler.set_python_path(client, orig_interpreter_path.lsp[client])
     end
