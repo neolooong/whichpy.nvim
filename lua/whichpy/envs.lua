@@ -34,6 +34,10 @@ M.handle_select = function(interpreter_path, should_cache)
   if not selected then
     _orig_interpreter_path["lsp"] = {}
     _orig_interpreter_path["dap"] = {}
+    _orig_interpreter_path["envvar"] = {
+      CONDA_PREFIX = vim.env.CONDA_PREFIX,
+      VIRTUAL_ENV = vim.env.VIRTUAL_ENV,
+    }
   end
 
   -- lsp
@@ -57,6 +61,12 @@ M.handle_select = function(interpreter_path, should_cache)
       return interpreter_path
     end
   end
+
+  -- envvar
+  -- NOTE: Need to clear env vars to ensure DAP uses the selected interpreter environment
+  -- Setting specific env vars would be possible if knowing which locator was selected.
+  vim.env.VIRTUAL_ENV = nil
+  vim.env.CONDA_PREFIX = nil
 
   -- cache
   if should_cache then
@@ -91,6 +101,10 @@ M.handle_restore = function()
   if ok then
     dap_python.resolve_python = orig_interpreter_path.dap
   end
+
+  -- envvar
+  vim.env.VIRTUAL_ENV = orig_interpreter_path.envvar.VIRTUAL_ENV
+  vim.env.CONDA_PREFIX = orig_interpreter_path.envvar.CONDA_PREFIX
 
   -- cache
   local filename = vim.fn.getcwd():gsub("/", "%%")
