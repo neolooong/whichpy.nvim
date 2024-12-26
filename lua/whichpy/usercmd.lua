@@ -11,7 +11,7 @@ local subcommand_tbl = {
         vim.notify("Too many arguments", vim.log.levels.ERROR)
       else
         local python_path = opts.fargs[2]
-        if not vim.uv.fs_stat(python_path) then
+        if not (vim.uv or vim.loop).fs_stat(python_path) then
           util.notify(python_path .. " doesn't exists.")
         else
           require("whichpy.envs").handle_select(python_path)
@@ -23,15 +23,25 @@ local subcommand_tbl = {
       if #envs == 0 then
         return {}
       end
-      envs = vim
-        .iter(envs)
-        :map(function(env)
-          return env.interpreter_path
-        end)
-        :filter(function(env)
-          return env:find(subcmd_arg_lead)
-        end)
-        :totable()
+      if vim.iter then
+        envs = vim
+          .iter(envs)
+          :map(function(env)
+            return env.interpreter_path
+          end)
+          :filter(function(env)
+            return env:find(subcmd_arg_lead)
+          end)
+          :totable()
+      else
+        local _t = {}
+        for _, env in ipairs(envs) do
+          if env.interpreter_path:find() then
+            table.insert(_t, env.interpreter_path)
+          end
+        end
+        envs = _t
+      end
       return util.deduplicate(envs)
     end,
   },
@@ -92,12 +102,22 @@ M.create_user_cmd = function()
 
       if cmdline:match("^WhichPy%s+%w*$") then
         local subcommand_keys = vim.tbl_keys(subcommand_tbl)
-        return vim
-          .iter(subcommand_keys)
-          :filter(function(key)
-            return key:find(arg_lead) ~= nil
-          end)
-          :totable()
+        if vim.iter then
+          return vim
+            .iter(subcommand_keys)
+            :filter(function(key)
+              return key:find(arg_lead) ~= nil
+            end)
+            :totable()
+        else
+          local _t = {}
+          for _, key in ipairs(subcommand_keys) do
+            if key:find(arg_lead) ~= nil then
+              table.insert(_t, key)
+            end
+          end
+          return _t
+        end
       end
     end,
   })

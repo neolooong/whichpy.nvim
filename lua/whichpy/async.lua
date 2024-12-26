@@ -37,8 +37,8 @@ function M.wrap(func)
     local cb = args[cb_idx]
     args[cb_idx] = function(...)
       if vim.in_fast_event() then
-        args = {...}
-        vim.schedule(function ()
+        args = { ... }
+        vim.schedule(function()
           cb(true, unpack(args))
         end)
       else

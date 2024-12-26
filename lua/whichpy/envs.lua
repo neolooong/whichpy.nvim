@@ -38,7 +38,7 @@ M.handle_select = function(interpreter_path, should_cache)
 
   -- lsp
   for lsp_name, handler in pairs(config.lsp) do
-    local client = vim.lsp.get_clients({ name = lsp_name })[1]
+    local client = (vim.lsp.get_clients or vim.lsp.get_active_clients)({ name = lsp_name })[1]
     if client then
       if not selected then
         _orig_interpreter_path["lsp"][lsp_name] = handler.get_python_path(client)
@@ -62,7 +62,7 @@ M.handle_select = function(interpreter_path, should_cache)
   if should_cache then
     vim.fn.mkdir(config.cache_dir, "p")
     local filename = vim.fn.getcwd():gsub("[\\/:]+", "%%")
-    local f = assert(io.open(vim.fs.joinpath(config.cache_dir, filename), "wb"))
+    local f = assert(io.open(util.joinpath(config.cache_dir, filename), "wb"))
     f:write(interpreter_path)
     f:close()
   end
@@ -80,7 +80,7 @@ M.handle_restore = function()
 
   -- lsp
   for lsp_name, handler in pairs(config.lsp) do
-    local client = vim.lsp.get_clients({ name = lsp_name })[1]
+    local client = (vim.lsp.get_clients or vim.lsp.get_active_clients)({ name = lsp_name })[1]
     if client then
       handler.set_python_path(client, orig_interpreter_path.lsp[client])
     end
@@ -94,7 +94,7 @@ M.handle_restore = function()
 
   -- cache
   local filename = vim.fn.getcwd():gsub("/", "%%")
-  os.remove(vim.fs.joinpath(config.cache_dir, filename))
+  os.remove(util.joinpath(config.cache_dir, filename))
 
   orig_interpreter_path = nil
   curr_interpreter_path = nil
@@ -102,7 +102,7 @@ end
 
 M.retrieve_cache = function()
   local filename = vim.fn.getcwd():gsub("/", "%%")
-  local f = io.open(vim.fs.joinpath(config.cache_dir, filename), "r")
+  local f = io.open(util.joinpath(config.cache_dir, filename), "r")
   if not f then
     util.notify("No cache.")
     return
