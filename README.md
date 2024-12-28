@@ -12,6 +12,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
 - Support nvim-dap-python.
 - Switch between python interpreters without restart LSPs. (Except `WhichPy restore` on Pyright)
 - Support multiple pickers. (`builtin`, `fzf-lua`, `telescope`)
+- Automatically select the previously chosen interpreter based on the directory.
 - Search on common directories, currently support:
   - workspace (relative path of `vim.fn.getcwd()`)
   - global (`vim.env.Path` and common posix paths)
@@ -131,53 +132,6 @@ This plugin provide these commands:
 ## FAQ
 
 <details>
-  <summary>How to activate environment automatically?</summary>
-
-  - Activate environment before open neovim.
-  - Set the python path when lsp initalize.
-
-    ```lua
-    -- pyright, basedpyright
-    require("lspconfig").pyright.setup({
-      on_init = function(client)
-        client.settings.python.pythonPath = require("whichpy.lsp").find_python_path(client.config.root_dir)
-      end
-    })
-
-    -- pylsp
-    require("lspconfig").pylsp.setup({
-      on_init = function(client)
-        client.settings = vim.tbl_deep_extend("force", client.settings, {
-          pylsp = {
-            plugins = {
-              jedi = {
-                environment = require("whichpy.lsp").find_python_path(client.config.root_dir)
-              }
-            }
-          }
-        })
-      end
-    })
-    ```
-
-  - When lsp attached.
-
-    ```lua
-    local augroup = vim.api.nvim_create_augroup("WhichPyRetrievePylsp", { clear = true })
-    vim.api.nvim_create_autocmd({ "LspAttach" }, {
-      pattern = { "*" },
-      group = augroup,
-      callback = function(args)
-        if vim.lsp.get_client_by_id(args["data"]["client_id"])["name"] == "pylsp" then
-          require("whichpy.envs").retrieve_cache()
-          vim.api.nvim_del_augroup_by_id(augroup)
-        end
-      end,
-    })
-    ```
-</details>
-
-<details>
   <summary>How to work with neotest?</summary>
 
   ```lua
@@ -201,7 +155,7 @@ This plugin provide these commands:
         adapters = { python_adapter },
       })
     end,
-  },
+  }
   ```
 </details>
 
