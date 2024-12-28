@@ -101,9 +101,9 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
       conda = {},
     },
     lsp = {
-      pylsp = require("whichpy.lsp").handlers.pylsp,
-      pyright = require("whichpy.lsp").handlers.pyright,
-      basedpyright = require("whichpy.lsp").handlers.pyright,
+      pylsp = require("whichpy.lsp.handlers.pylsp"),
+      pyright = require("whichpy.lsp.handlers.pyright"),
+      basedpyright = require("whichpy.lsp.handlers.pyright"),
     },
   }
   ```
