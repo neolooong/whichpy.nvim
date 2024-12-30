@@ -1,6 +1,5 @@
 ---@class Locator
 ---@field find fun(): async fun()
----@field resolve fun(interpreter_path: string): InterpreterInfo
 ---@field merge_opts? fun(opts: table)
 
 ---@class InterpreterInfo
@@ -43,7 +42,7 @@ end
 M.iterate = function(on_result)
   for _, locator in pairs(locators) do
     for interpreter_path in locator.find() do
-      local env_info = setmetatable(locator.resolve(interpreter_path), {
+      local env_info = setmetatable(interpreter_path, {
         __tostring = function(t)
           return string.format(
             "(%s) %s",

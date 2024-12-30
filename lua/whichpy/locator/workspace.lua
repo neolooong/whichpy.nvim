@@ -22,7 +22,7 @@ return {
 
             if not vim.list_contains(_opts.ignore_dirs, name) then
               if name:match(_opts.search_pattern) and vim.uv.fs_stat(interpreter_path) then
-                coroutine.yield(interpreter_path)
+                coroutine.yield({ locator = "Workspace", interpreter_path = interpreter_path })
               elseif depth < _opts.depth then
                 dirs[#dirs + 1] = { vim.fs.joinpath(dir, name), depth + 1 }
               end
@@ -31,11 +31,5 @@ return {
         end
       end
     end)
-  end,
-  resolve = function(interpreter_path)
-    return {
-      locator = "Workspace",
-      interpreter_path = interpreter_path,
-    }
   end,
 }

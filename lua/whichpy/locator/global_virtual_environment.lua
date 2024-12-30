@@ -38,17 +38,14 @@ return {
           if t == "directory" then
             local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
             if vim.uv.fs_stat(interpreter_path) then
-              coroutine.yield(interpreter_path)
+              coroutine.yield({
+                locator = "Global Virtual Environemnt",
+                interpreter_path = interpreter_path,
+              })
             end
           end
         end
       end
     end)
-  end,
-  resolve = function(interpreter_path)
-    return {
-      locator = "Global Virtual Environemnt",
-      interpreter_path = interpreter_path,
-    }
   end,
 }

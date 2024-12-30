@@ -1,5 +1,6 @@
-local is_win = vim.uv.os_uname().sysname == "Windows_NT"
-local get_interpreter_path = require("whichpy.util").get_interpreter_path
+local util = require("whichpy.util")
+local is_win = util.is_win
+local get_interpreter_path = util.get_interpreter_path
 local asystem = require("whichpy.async").asystem
 
 local get_conda_info = function()
@@ -27,15 +28,9 @@ return {
       for _, env in ipairs(envs) do
         local interpreter_path = get_interpreter_path(env, is_win and "root" or "bin")
         if vim.uv.fs_stat(interpreter_path) then
-          coroutine.yield(interpreter_path)
+          coroutine.yield({ locator = "Conda", interpreter_path = interpreter_path })
         end
       end
     end)
-  end,
-  resolve = function(interpreter_path)
-    return {
-      locator = "Conda",
-      interpreter_path = interpreter_path,
-    }
   end,
 }

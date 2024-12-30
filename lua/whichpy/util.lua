@@ -1,8 +1,7 @@
-local is_win = vim.uv.os_uname().sysname == "Windows_NT"
-local bin_scripts = (is_win and "Scripts") or "bin"
-local filename = (is_win and "python.exe") or "python"
-
 local M = {}
+M.is_win = vim.uv.os_uname().sysname == "Windows_NT"
+M.bin_scripts = (M.is_win and "Scripts") or "bin"
+M.filename = (M.is_win and "python.exe") or "python"
 
 ---@class (exact) WhichPy.NotifyOpt
 ---@field once boolean|nil defaults to false
@@ -44,7 +43,7 @@ end
 ---@param case "root" | "bin"
 ---@return string
 M.get_interpreter_path = function(dir, case)
-  return vim.fs.joinpath(dir, case == "root" and "" or bin_scripts, filename)
+  return vim.fs.joinpath(dir, case == "root" and "" or M.bin_scripts, M.filename)
 end
 
 ---@param plugin "fzf-lua"|"telescope"
