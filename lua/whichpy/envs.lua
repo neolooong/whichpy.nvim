@@ -25,7 +25,7 @@ M.show_selector = function()
   require("whichpy.picker")[config.picker.name]:show()
 end
 
-M.handle_select = function(interpreter_path, should_cache)
+M.handle_select = function(locator, interpreter_path, should_cache)
   local selected = orig_interpreter_path ~= nil
   local _orig_interpreter_path = {}
   should_cache = should_cache == nil or should_cache
@@ -62,17 +62,26 @@ M.handle_select = function(interpreter_path, should_cache)
   end
 
   -- envvar
-  -- NOTE: Need to clear env vars to ensure DAP uses the selected interpreter environment
-  -- Setting specific env vars would be possible if knowing which locator was selected.
-  vim.env.VIRTUAL_ENV = nil
-  vim.env.CONDA_PREFIX = nil
+  local envvar, val = locator:determine_env_var(interpreter_path)
+  if envvar == "VIRTUAL_ENV" then
+    vim.env.VIRTUAL_ENV = val
+    vim.env.CONDA_PREFIX = nil
+  elseif envvar == "CONDA_PREFIX" then
+    vim.env.VIRTUAL_ENV = nil
+    vim.env.CONDA_PREFIX = val
+  else
+    vim.env.VIRTUAL_ENV = nil
+    vim.env.CONDA_PREFIX = nil
+  end
+  require("whichpy.util").notify("$VIRTUAL_ENV: " .. (vim.env.VIRTUAL_ENV or "nil"))
+  require("whichpy.util").notify("$CONDA_PREFIX: " .. (vim.env.CONDA_PREFIX or "nil"))
 
   -- cache
   if should_cache then
     vim.fn.mkdir(config.cache_dir, "p")
     local filename = vim.fn.getcwd():gsub("[\\/:]+", "%%")
     local f = assert(io.open(vim.fs.joinpath(config.cache_dir, filename), "wb"))
-    f:write(interpreter_path)
+    f:write(interpreter_path .. "\n" .. locator.name)
     f:close()
   end
 
@@ -117,13 +126,17 @@ M.retrieve_cache = function()
   local filename = vim.fn.getcwd():gsub("/", "%%")
   local f = io.open(vim.fs.joinpath(config.cache_dir, filename), "r")
   if not f then
-    -- util.notify("No cache.")
     return
   end
-  local interpreter_path = f:read()
+  local lines = {}
+  local line = f:read()
+  while line do
+    table.insert(lines, line)
+    line = f:read()
+  end
   f:close()
 
-  M.handle_select(interpreter_path, false)
+  M.handle_select(require("whichpy.locator." .. (lines[2] or "global")), lines[1], false)
 end
 
 M.current_selected = function()

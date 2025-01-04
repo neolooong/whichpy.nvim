@@ -44,7 +44,7 @@ function Picker:show()
       map({ "i", "n" }, "<Cr>", function(prompt_bufnr)
         actions.close(prompt_bufnr)
         local selected_entry = action_state.get_selected_entry()
-        handle_select(selected_entry.value.interpreter_path)
+        handle_select(selected_entry.value.locator, selected_entry.value.interpreter_path)
       end)
 
       map({ "i", "n" }, "<C-r>", function()

@@ -12,31 +12,42 @@ local get_pyenv_version_dir = function()
   return vim.fs.joinpath(pyenv_root, "versions")
 end
 
-return {
-  find = function()
-    return coroutine.wrap(function()
-      local dir = get_pyenv_version_dir()
+local Locator = { name = "pyenv", display_name = "Pyenv" }
 
-      for name, t in vim.fs.dir(dir) do
-        if t == "directory" then
-          local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
-          if vim.uv.fs_stat(interpreter_path) then
-            coroutine.yield({ locator = "Pyenv", interpreter_path = interpreter_path })
+function Locator:find()
+  return coroutine.wrap(function()
+    local dir = get_pyenv_version_dir()
 
-            local envs_dir = vim.fs.joinpath(dir, name, "envs")
+    for name, t in vim.fs.dir(dir) do
+      if t == "directory" then
+        local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
+        if vim.uv.fs_stat(interpreter_path) then
+          coroutine.yield({ locator = self, interpreter_path = interpreter_path })
 
-            ---@diagnostic disable-next-line: redefined-local
-            for name, t in vim.fs.dir(envs_dir) do
-              if t == "directory" then
-                interpreter_path = get_interpreter_path(vim.fs.joinpath(envs_dir, name), "bin")
-                if vim.uv.fs_stat(interpreter_path) then
-                  coroutine.yield({ locator = "Pyenv", interpreter_path = interpreter_path })
-                end
+          local envs_dir = vim.fs.joinpath(dir, name, "envs")
+
+          ---@diagnostic disable-next-line: redefined-local
+          for name, t in vim.fs.dir(envs_dir) do
+            if t == "directory" then
+              interpreter_path = get_interpreter_path(vim.fs.joinpath(envs_dir, name), "bin")
+              if vim.uv.fs_stat(interpreter_path) then
+                coroutine.yield({ locator = self, interpreter_path = interpreter_path })
               end
             end
           end
         end
       end
-    end)
-  end,
-}
+    end
+  end)
+end
+
+function Locator:determine_env_var(path)
+  local venv = vim.fs.dirname(vim.fs.dirname(path))
+  local pyvenv_cfg = vim.fs.joinpath(venv, "pyvenv.cfg")
+  if vim.uv.fs_stat(pyvenv_cfg) then
+    return "VIRTUAL_ENV", venv
+  end
+  return nil, nil
+end
+
+return Locator
