@@ -44,15 +44,6 @@ local subcommand_tbl = {
       end
     end,
   },
-  retrieve = {
-    impl = function(opts)
-      if #opts.fargs > 1 then
-        vim.notify("Too many arguments", vim.log.levels.ERROR)
-      else
-        require("whichpy.envs").retrieve_cache()
-      end
-    end,
-  },
   rescan = {
     impl = function(opts)
       if #opts.fargs > 1 then

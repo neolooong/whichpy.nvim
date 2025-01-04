@@ -122,10 +122,6 @@ This plugin provide these commands:
 
   Reset LSPs configuration, and clear the cache.
 
-### `:WhichPy retrieve`
-
-  Retrieve the interpreter path from cache, then configure lsp.
-
 ### `:WhichPy rescan`
 
   Search python interpreter again.
