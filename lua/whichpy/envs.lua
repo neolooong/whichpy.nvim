@@ -105,7 +105,7 @@ M.handle_select = function(locator, interpreter_path, should_cache)
   curr_interpreter_path = interpreter_path
 end
 
-M.handle_restore = function()
+M.handle_reset = function()
   if orig_interpreter_path == nil then
     return
   end

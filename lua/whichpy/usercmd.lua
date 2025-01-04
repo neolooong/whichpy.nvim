@@ -35,12 +35,12 @@ local subcommand_tbl = {
       return util.deduplicate(envs)
     end,
   },
-  restore = {
+  reset = {
     impl = function(opts)
       if #opts.fargs > 1 then
         vim.notify("Too many arguments", vim.log.levels.ERROR)
       else
-        require("whichpy.envs").handle_restore()
+        require("whichpy.envs").handle_reset()
       end
     end,
   },

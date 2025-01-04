@@ -10,7 +10,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
 
 - Support multiple Lsp servers. (Pylsp, Pyright, BasedPyright)
 - Support nvim-dap-python.
-- Switch between python interpreters without restart LSPs. (Except `WhichPy restore` on Pyright)
+- Switch between python interpreters without restart LSPs. (Except `WhichPy reset` on Pyright)
 - Support multiple pickers. (`builtin`, `fzf-lua`, `telescope`)
 - Automatically select the previously chosen interpreter based on the directory.
 - Search on common directories, currently support:
@@ -118,9 +118,9 @@ This plugin provide these commands:
 
   If `path` provided, LSPs would be configured. Otherwise, picker would show up.
 
-### `:WhichPy restore`
+### `:WhichPy reset`
 
-  Restore LSPs configuration, and clear the cache.
+  Reset LSPs configuration, and clear the cache.
 
 ### `:WhichPy retrieve`
 
