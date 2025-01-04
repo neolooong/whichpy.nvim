@@ -52,6 +52,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
   ```lua
   {
     cache_dir = vim.fn.stdpath("cache") .. "/whichpy.nvim",
+    update_path_env = false,  -- Whether to modify $PATH when switching interpreters.
     picker = {
       name = "builtin",  -- must be one of ("builtin", "fzf-lua", "telescope")
       -- You can customize the picker as follows. For available options, refer to the respective documentation.
