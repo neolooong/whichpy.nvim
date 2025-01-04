@@ -1,4 +1,6 @@
 local config = require("whichpy.config").config
+local util = require("whichpy.util")
+local is_win = util.is_win
 local SearchJob = require("whichpy.search")
 local final_envs = {}
 local orig_interpreter_path
@@ -61,7 +63,7 @@ M.handle_select = function(locator, interpreter_path, should_cache)
     end
   end
 
-  -- envvar
+  -- $VIRTUAL_ENV, $CONDA_PREFIX
   local envvar, val = locator:determine_env_var(interpreter_path)
   if envvar == "VIRTUAL_ENV" then
     vim.env.VIRTUAL_ENV = val
@@ -73,8 +75,20 @@ M.handle_select = function(locator, interpreter_path, should_cache)
     vim.env.VIRTUAL_ENV = nil
     vim.env.CONDA_PREFIX = nil
   end
-  require("whichpy.util").notify("$VIRTUAL_ENV: " .. (vim.env.VIRTUAL_ENV or "nil"))
-  require("whichpy.util").notify("$CONDA_PREFIX: " .. (vim.env.CONDA_PREFIX or "nil"))
+
+  util.notify("$VIRTUAL_ENV: " .. (vim.env.VIRTUAL_ENV or "nil"))
+  util.notify("$CONDA_PREFIX: " .. (vim.env.CONDA_PREFIX or "nil"))
+
+  -- $PATH
+  if config.update_path_env then
+    local delimiter = (is_win and ";") or ":"
+    if selected then
+      vim.env.PATH = vim.env.PATH:gsub(vim.fs.dirname(curr_interpreter_path) .. delimiter, "", 1)
+    end
+    vim.env.PATH = vim.fs.dirname(interpreter_path) .. delimiter .. vim.env.PATH
+
+    util.notify("Prepend ".. vim.fs.dirname(interpreter_path) .. " to $PATH.")
+  end
 
   -- cache
   if should_cache then
@@ -110,9 +124,18 @@ M.handle_restore = function()
     dap_python.resolve_python = orig_interpreter_path.dap
   end
 
-  -- envvar
+  -- $VIRTUAL_ENV, $CONDA_PREFIX
   vim.env.VIRTUAL_ENV = orig_interpreter_path.envvar.VIRTUAL_ENV
   vim.env.CONDA_PREFIX = orig_interpreter_path.envvar.CONDA_PREFIX
+
+  util.notify("$VIRTUAL_ENV: " .. (vim.env.VIRTUAL_ENV or "nil"))
+  util.notify("$CONDA_PREFIX: " .. (vim.env.CONDA_PREFIX or "nil"))
+
+  -- $PATH
+  if config.update_path_env then
+    local delimiter = (is_win and ";") or ":"
+    vim.env.PATH = vim.env.PATH:gsub(vim.fs.dirname(curr_interpreter_path) .. delimiter, "", 1)
+  end
 
   -- cache
   local filename = vim.fn.getcwd():gsub("/", "%%")
