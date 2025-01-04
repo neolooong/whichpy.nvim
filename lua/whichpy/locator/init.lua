@@ -1,6 +1,5 @@
 ---@class Locator
 ---@field find fun(): async fun()
----@field resolve fun(interpreter_path: string): InterpreterInfo
 ---@field merge_opts? fun(opts: table)
 
 ---@class InterpreterInfo
@@ -42,12 +41,12 @@ end
 ---@param on_result function
 M.iterate = function(on_result)
   for _, locator in pairs(locators) do
-    for interpreter_path in locator.find() do
-      local env_info = setmetatable(locator.resolve(interpreter_path), {
+    for interpreter_path in locator:find() do
+      local env_info = setmetatable(interpreter_path, {
         __tostring = function(t)
           return string.format(
             "(%s) %s",
-            t.locator,
+            t.locator.display_name,
             vim.fn.fnamemodify(t.interpreter_path, ":p:~:.")
           )
         end,

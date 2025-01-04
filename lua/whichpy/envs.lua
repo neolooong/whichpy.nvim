@@ -1,4 +1,6 @@
 local config = require("whichpy.config").config
+local util = require("whichpy.util")
+local is_win = util.is_win
 local SearchJob = require("whichpy.search")
 local final_envs = {}
 local orig_interpreter_path
@@ -25,7 +27,7 @@ M.show_selector = function()
   require("whichpy.picker")[config.picker.name]:show()
 end
 
-M.handle_select = function(interpreter_path, should_cache)
+M.handle_select = function(locator, interpreter_path, should_cache)
   local selected = orig_interpreter_path ~= nil
   local _orig_interpreter_path = {}
   should_cache = should_cache == nil or should_cache
@@ -61,18 +63,39 @@ M.handle_select = function(interpreter_path, should_cache)
     end
   end
 
-  -- envvar
-  -- NOTE: Need to clear env vars to ensure DAP uses the selected interpreter environment
-  -- Setting specific env vars would be possible if knowing which locator was selected.
-  vim.env.VIRTUAL_ENV = nil
-  vim.env.CONDA_PREFIX = nil
+  -- $VIRTUAL_ENV, $CONDA_PREFIX
+  local envvar, val = locator:determine_env_var(interpreter_path)
+  if envvar == "VIRTUAL_ENV" then
+    vim.env.VIRTUAL_ENV = val
+    vim.env.CONDA_PREFIX = nil
+  elseif envvar == "CONDA_PREFIX" then
+    vim.env.VIRTUAL_ENV = nil
+    vim.env.CONDA_PREFIX = val
+  else
+    vim.env.VIRTUAL_ENV = nil
+    vim.env.CONDA_PREFIX = nil
+  end
+
+  util.notify("$VIRTUAL_ENV: " .. (vim.env.VIRTUAL_ENV or "nil"))
+  util.notify("$CONDA_PREFIX: " .. (vim.env.CONDA_PREFIX or "nil"))
+
+  -- $PATH
+  if config.update_path_env then
+    local delimiter = (is_win and ";") or ":"
+    if selected then
+      vim.env.PATH = vim.env.PATH:gsub(vim.fs.dirname(curr_interpreter_path) .. delimiter, "", 1)
+    end
+    vim.env.PATH = vim.fs.dirname(interpreter_path) .. delimiter .. vim.env.PATH
+
+    util.notify("Prepend ".. vim.fs.dirname(interpreter_path) .. " to $PATH.")
+  end
 
   -- cache
   if should_cache then
     vim.fn.mkdir(config.cache_dir, "p")
     local filename = vim.fn.getcwd():gsub("[\\/:]+", "%%")
     local f = assert(io.open(vim.fs.joinpath(config.cache_dir, filename), "wb"))
-    f:write(interpreter_path)
+    f:write(interpreter_path .. "\n" .. locator.name)
     f:close()
   end
 
@@ -101,9 +124,18 @@ M.handle_restore = function()
     dap_python.resolve_python = orig_interpreter_path.dap
   end
 
-  -- envvar
+  -- $VIRTUAL_ENV, $CONDA_PREFIX
   vim.env.VIRTUAL_ENV = orig_interpreter_path.envvar.VIRTUAL_ENV
   vim.env.CONDA_PREFIX = orig_interpreter_path.envvar.CONDA_PREFIX
+
+  util.notify("$VIRTUAL_ENV: " .. (vim.env.VIRTUAL_ENV or "nil"))
+  util.notify("$CONDA_PREFIX: " .. (vim.env.CONDA_PREFIX or "nil"))
+
+  -- $PATH
+  if config.update_path_env then
+    local delimiter = (is_win and ";") or ":"
+    vim.env.PATH = vim.env.PATH:gsub(vim.fs.dirname(curr_interpreter_path) .. delimiter, "", 1)
+  end
 
   -- cache
   local filename = vim.fn.getcwd():gsub("/", "%%")
@@ -117,13 +149,17 @@ M.retrieve_cache = function()
   local filename = vim.fn.getcwd():gsub("/", "%%")
   local f = io.open(vim.fs.joinpath(config.cache_dir, filename), "r")
   if not f then
-    -- util.notify("No cache.")
     return
   end
-  local interpreter_path = f:read()
+  local lines = {}
+  local line = f:read()
+  while line do
+    table.insert(lines, line)
+    line = f:read()
+  end
   f:close()
 
-  M.handle_select(interpreter_path, false)
+  M.handle_select(require("whichpy.locator." .. (lines[2] or "global")), lines[1], false)
 end
 
 M.current_selected = function()

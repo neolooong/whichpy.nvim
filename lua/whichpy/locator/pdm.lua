@@ -8,29 +8,29 @@ local get_pdm_venv_location = function()
   end
 end
 
-return {
-  find = function()
-    local dir = get_pdm_venv_location()
+local Locator = { name = "pdm", display_name = "PDM" }
 
-    return coroutine.wrap(function()
-      if not dir then
-        return
-      end
+function Locator:find()
+  local dir = get_pdm_venv_location()
 
-      for name, t in vim.fs.dir(dir) do
-        if t == "directory" then
-          local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
-          if vim.uv.fs_stat(interpreter_path) then
-            coroutine.yield(interpreter_path)
-          end
+  return coroutine.wrap(function()
+    if not dir then
+      return
+    end
+
+    for name, t in vim.fs.dir(dir) do
+      if t == "directory" then
+        local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
+        if vim.uv.fs_stat(interpreter_path) then
+          coroutine.yield({ locator = self, interpreter_path = interpreter_path })
         end
       end
-    end)
-  end,
-  resolve = function(interpreter_path)
-    return {
-      locator = "PDM",
-      interpreter_path = interpreter_path,
-    }
-  end,
-}
+    end
+  end)
+end
+
+function Locator:determine_env_var(path)
+  return "VIRTUAL_ENV", vim.fs.dirname(vim.fs.dirname(path))
+end
+
+return Locator

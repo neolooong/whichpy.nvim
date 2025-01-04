@@ -3,6 +3,7 @@
 ---@field locator? WhichPy.Config.Locator
 ---@field lsp? table<string,WhichPy.Lsp.Handler>
 ---@field picker? WhichPy.Config.Picker
+---@field update_path_env? boolean
 
 ---@class (exact) WhichPy.Config.Locator
 ---@field workspace? WhichPy.Config.Locator.Workspace
@@ -41,6 +42,7 @@
 local _default_config = {
   cache_dir = vim.fn.stdpath("cache") .. "/whichpy.nvim",
   picker = { name = "builtin" },
+  update_path_env = false,
   locator = {
     workspace = {
       search_pattern = ".*env.*",

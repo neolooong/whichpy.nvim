@@ -16,7 +16,7 @@ end
 function Picker:_show(opts, envs)
   vim.ui.select(envs, opts, function(choice)
     if choice ~= nil then
-      handle_select(choice.interpreter_path)
+      handle_select(choice.locator, choice.interpreter_path)
     end
   end)
 end
