@@ -12,7 +12,13 @@ function Picker:setup()
     "force",
     {
       fzf_opts = { ["--layout"] = "reverse" },
-      winopts = { height = 0.33, width = 0.66 },
+      winopts = {
+        title = " Select Python Interpreter ",
+        title_pos = "center",
+        height = 0.33,
+        width = 0.66,
+        row = 0.5,
+      },
     },
     config.picker["fzf-lua"] or {},
     { fzf_opts = { ["--with-nth"] = "2", ["--delimiter"] = "\t" } },
