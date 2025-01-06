@@ -1,9 +1,12 @@
 ---@class Locator
----@field find fun(): async fun()
+---@field name string
+---@field display_name string
 ---@field merge_opts? fun(opts: table)
+---@field find fun(): async fun(): InterpreterInfo
+---@field determine_env_var fun(self, path: string): string?, string?
 
 ---@class InterpreterInfo
----@field locator string name of the locator
+---@field locator Locator
 ---@field interpreter_path string
 
 ---@type table<string, Locator>
@@ -41,8 +44,8 @@ end
 ---@param on_result function
 M.iterate = function(on_result)
   for _, locator in pairs(locators) do
-    for interpreter_path in locator:find() do
-      local env_info = setmetatable(interpreter_path, {
+    for interpreter_info in locator:find() do
+      setmetatable(interpreter_info, {
         __tostring = function(t)
           return string.format(
             "(%s) %s",
@@ -51,7 +54,7 @@ M.iterate = function(on_result)
           )
         end,
       })
-      on_result(env_info)
+      on_result(interpreter_info)
     end
   end
 end

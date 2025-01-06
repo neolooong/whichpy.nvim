@@ -27,7 +27,7 @@ function Picker:setup()
         ["default"] = function(selected, _)
           local key = string.match(selected[1], "^(.*)\t")
           local env = Picker.env_map[key]
-          handle_select(env.locator, env.interpreter_path)
+          handle_select(env)
         end,
         ["ctrl-r"] = {
           function(_)

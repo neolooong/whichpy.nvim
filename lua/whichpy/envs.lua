@@ -27,12 +27,14 @@ M.show_selector = function()
   require("whichpy.picker")[config.picker.name]:show()
 end
 
-M.handle_select = function(locator, interpreter_path, should_cache)
-  local selected = orig_interpreter_path ~= nil
+---@param selected InterpreterInfo
+---@param should_cache? boolean
+M.handle_select = function(selected, should_cache)
+  local should_backup_original = orig_interpreter_path == nil
   local _orig_interpreter_path = {}
   should_cache = should_cache == nil or should_cache
 
-  if not selected then
+  if should_backup_original then
     _orig_interpreter_path["lsp"] = {}
     _orig_interpreter_path["dap"] = {}
     _orig_interpreter_path["envvar"] = {
@@ -45,26 +47,26 @@ M.handle_select = function(locator, interpreter_path, should_cache)
   for lsp_name, handler in pairs(config.lsp) do
     local client = vim.lsp.get_clients({ name = lsp_name })[1]
     if client then
-      if not selected then
+      if should_backup_original then
         _orig_interpreter_path["lsp"][lsp_name] = handler.get_python_path(client)
       end
-      handler.set_python_path(client, interpreter_path)
+      handler.set_python_path(client, selected.interpreter_path)
     end
   end
 
   -- dap
   local ok, dap_python = pcall(require, "dap-python")
   if ok then
-    if not selected then
+    if should_backup_original then
       _orig_interpreter_path["dap"] = dap_python.resolve_python
     end
     dap_python.resolve_python = function()
-      return interpreter_path
+      return selected.interpreter_path
     end
   end
 
   -- $VIRTUAL_ENV, $CONDA_PREFIX
-  local envvar, val = locator:determine_env_var(interpreter_path)
+  local envvar, val = selected.locator:determine_env_var(selected.interpreter_path)
   if envvar == "VIRTUAL_ENV" then
     vim.env.VIRTUAL_ENV = val
     vim.env.CONDA_PREFIX = nil
@@ -82,12 +84,12 @@ M.handle_select = function(locator, interpreter_path, should_cache)
   -- $PATH
   if config.update_path_env then
     local delimiter = (is_win and ";") or ":"
-    if selected then
+    if not should_backup_original then
       vim.env.PATH = vim.env.PATH:gsub(vim.fs.dirname(curr_interpreter_path) .. delimiter, "", 1)
     end
-    vim.env.PATH = vim.fs.dirname(interpreter_path) .. delimiter .. vim.env.PATH
+    vim.env.PATH = vim.fs.dirname(selected.interpreter_path) .. delimiter .. vim.env.PATH
 
-    util.notify("Prepend ".. vim.fs.dirname(interpreter_path) .. " to $PATH.")
+    util.notify("Prepend " .. vim.fs.dirname(selected.interpreter_path) .. " to $PATH.")
   end
 
   -- cache
@@ -95,14 +97,18 @@ M.handle_select = function(locator, interpreter_path, should_cache)
     vim.fn.mkdir(config.cache_dir, "p")
     local filename = vim.fn.getcwd():gsub("[\\/:]+", "%%")
     local f = assert(io.open(vim.fs.joinpath(config.cache_dir, filename), "wb"))
-    f:write(interpreter_path .. "\n" .. locator.name)
+    f:write(selected.interpreter_path .. "\n" .. selected.locator.name)
     f:close()
   end
 
-  if not selected then
+  if should_backup_original then
     orig_interpreter_path = _orig_interpreter_path
   end
-  curr_interpreter_path = interpreter_path
+  curr_interpreter_path = selected.interpreter_path
+
+  if config.after_handle_select then
+    config.after_handle_select(selected)
+  end
 end
 
 M.handle_reset = function()
@@ -159,7 +165,10 @@ M.retrieve_cache = function()
   end
   f:close()
 
-  M.handle_select(require("whichpy.locator." .. (lines[2] or "global")), lines[1], false)
+  M.handle_select({
+    locator = require("whichpy.locator." .. (lines[2] or "global")),
+    interpreter_path = lines[1],
+  }, false)
 end
 
 M.current_selected = function()

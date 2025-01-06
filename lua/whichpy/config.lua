@@ -4,6 +4,7 @@
 ---@field lsp? table<string,WhichPy.Lsp.Handler>
 ---@field picker? WhichPy.Config.Picker
 ---@field update_path_env? boolean
+---@field after_handle_select? fun(selected: InterpreterInfo)
 
 ---@class (exact) WhichPy.Config.Locator
 ---@field workspace? WhichPy.Config.Locator.Workspace
@@ -78,6 +79,7 @@ local _default_config = {
     pyright = require("whichpy.lsp.handlers.pyright"),
     basedpyright = require("whichpy.lsp.handlers.pyright"),
   },
+  after_handle_select = nil,
 }
 
 local M = {}
