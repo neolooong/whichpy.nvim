@@ -1,8 +1,13 @@
 local get_interpreter_path = require("whichpy.util").get_interpreter_path
+local get_env_var_strategy = require("whichpy.locator._common").get_env_var_strategy
 
 local _opts = {}
 
-local Locator = { name = "workspace", display_name = "Workspace" }
+local Locator = {
+  name = "workspace",
+  display_name = "Workspace",
+  get_env_var = get_env_var_strategy.guess,
+}
 
 function Locator.merge_opts(opts)
   _opts = vim.tbl_deep_extend("force", _opts, opts or {})
@@ -33,10 +38,6 @@ function Locator:find()
       end
     end
   end)
-end
-
-function Locator:determine_env_var(path)
-  return "VIRTUAL_ENV", vim.fs.dirname(vim.fs.dirname(path))
 end
 
 return Locator

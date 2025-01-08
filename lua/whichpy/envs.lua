@@ -66,13 +66,13 @@ M.handle_select = function(selected, should_cache)
   end
 
   -- $VIRTUAL_ENV, $CONDA_PREFIX
-  local envvar, val = selected.locator:determine_env_var(selected.interpreter_path)
-  if envvar == "VIRTUAL_ENV" then
-    vim.env.VIRTUAL_ENV = val
+  local env_var = selected.locator.get_env_var(selected.interpreter_path)
+  if env_var.name == "VIRTUAL_ENV" then
+    vim.env.VIRTUAL_ENV = env_var.val
     vim.env.CONDA_PREFIX = nil
-  elseif envvar == "CONDA_PREFIX" then
+  elseif env_var.name == "CONDA_PREFIX" then
     vim.env.VIRTUAL_ENV = nil
-    vim.env.CONDA_PREFIX = val
+    vim.env.CONDA_PREFIX = env_var.val
   else
     vim.env.VIRTUAL_ENV = nil
     vim.env.CONDA_PREFIX = nil

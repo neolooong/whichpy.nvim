@@ -3,7 +3,7 @@
 ---@field display_name string
 ---@field merge_opts? fun(opts: table)
 ---@field find fun(): async fun(): InterpreterInfo
----@field determine_env_var fun(self, path: string): string?, string?
+---@field get_env_var fun(path: string): table<string,string>
 
 ---@class InterpreterInfo
 ---@field locator Locator
