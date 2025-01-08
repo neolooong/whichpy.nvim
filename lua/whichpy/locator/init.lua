@@ -57,7 +57,7 @@ M.InterpreterInfo = {}
 function M.InterpreterInfo:new(opts)
   return setmetatable({
     locator_name = opts.locator.name,
-    path = opts.path,
+    path = vim.fn.fnamemodify(opts.path, ":p"),
   }, {
     __tostring = function(tbl)
       return string.format(
