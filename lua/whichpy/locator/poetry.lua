@@ -1,11 +1,12 @@
 local get_interpreter_path = require("whichpy.util").get_interpreter_path
 local get_env_var_strategy = require("whichpy.locator._common").get_env_var_strategy
 local get_poetry_virtualenvs_path = require("whichpy.locator._common").get_poetry_virtualenvs_path
+local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
 local Locator = {
   name = "poetry",
   display_name = "Poetry",
-  get_env_var = get_env_var_strategy.guess,
+  get_env_var_strategy = get_env_var_strategy.virtual_env,
 }
 
 function Locator:find()
@@ -18,9 +19,9 @@ function Locator:find()
 
     for name, t in vim.fs.dir(dir) do
       if t == "directory" then
-        local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
-        if vim.uv.fs_stat(interpreter_path) then
-          coroutine.yield({ locator = self, interpreter_path = interpreter_path })
+        local path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
+        if vim.uv.fs_stat(path) then
+          coroutine.yield(InterpreterInfo:new({ locator = self, path = path }))
         end
       end
     end

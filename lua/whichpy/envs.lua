@@ -5,6 +5,7 @@ local SearchJob = require("whichpy.search")
 local final_envs = {}
 local orig_interpreter_path
 local curr_interpreter_path
+local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
 local M = {}
 
@@ -50,7 +51,7 @@ M.handle_select = function(selected, should_cache)
       if should_backup_original then
         _orig_interpreter_path["lsp"][lsp_name] = handler.get_python_path(client)
       end
-      handler.set_python_path(client, selected.interpreter_path)
+      handler.set_python_path(client, selected.path)
     end
   end
 
@@ -61,12 +62,12 @@ M.handle_select = function(selected, should_cache)
       _orig_interpreter_path["dap"] = dap_python.resolve_python
     end
     dap_python.resolve_python = function()
-      return selected.interpreter_path
+      return selected.path
     end
   end
 
   -- $VIRTUAL_ENV, $CONDA_PREFIX
-  local env_var = selected.locator.get_env_var(selected.interpreter_path)
+  local env_var = selected.env_var
   if env_var.name == "VIRTUAL_ENV" then
     vim.env.VIRTUAL_ENV = env_var.val
     vim.env.CONDA_PREFIX = nil
@@ -87,9 +88,9 @@ M.handle_select = function(selected, should_cache)
     if not should_backup_original then
       vim.env.PATH = vim.env.PATH:gsub(vim.fs.dirname(curr_interpreter_path) .. delimiter, "", 1)
     end
-    vim.env.PATH = vim.fs.dirname(selected.interpreter_path) .. delimiter .. vim.env.PATH
+    vim.env.PATH = vim.fs.dirname(selected.path) .. delimiter .. vim.env.PATH
 
-    util.notify("Prepend " .. vim.fs.dirname(selected.interpreter_path) .. " to $PATH.")
+    util.notify("Prepend " .. vim.fs.dirname(selected.path) .. " to $PATH.")
   end
 
   -- cache
@@ -97,14 +98,14 @@ M.handle_select = function(selected, should_cache)
     vim.fn.mkdir(config.cache_dir, "p")
     local filename = vim.fn.getcwd():gsub("[\\/:]+", "%%")
     local f = assert(io.open(vim.fs.joinpath(config.cache_dir, filename), "wb"))
-    f:write(selected.interpreter_path .. "\n" .. selected.locator.name)
+    f:write(selected.path .. "\n" .. selected.locator_name)
     f:close()
   end
 
   if should_backup_original then
     orig_interpreter_path = _orig_interpreter_path
   end
-  curr_interpreter_path = selected.interpreter_path
+  curr_interpreter_path = selected.path
 
   if config.after_handle_select then
     config.after_handle_select(selected)
@@ -165,10 +166,13 @@ M.retrieve_cache = function()
   end
   f:close()
 
-  M.handle_select({
-    locator = require("whichpy.locator." .. (lines[2] or "global")),
-    interpreter_path = lines[1],
-  }, false)
+  M.handle_select(
+    InterpreterInfo:new({
+      locator = require("whichpy.locator." .. (lines[2] or "global")),
+      path = lines[1],
+    }),
+    false
+  )
 end
 
 M.current_selected = function()

@@ -1,4 +1,5 @@
 local util = require("whichpy.util")
+local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
 local M = {}
 
@@ -14,10 +15,10 @@ local subcommand_tbl = {
         if not vim.uv.fs_stat(python_path) then
           util.notify(python_path .. " doesn't exists.")
         else
-          require("whichpy.envs").handle_select({
+          require("whichpy.envs").handle_select(InterpreterInfo:new({
             locator = require("whichpy.locator.global"),
-            interpreter_path = python_path,
-          })
+            path = python_path,
+          }))
         end
       end
     end,

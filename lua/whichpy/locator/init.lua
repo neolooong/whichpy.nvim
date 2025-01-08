@@ -5,10 +5,6 @@
 ---@field find fun(): async fun(): InterpreterInfo
 ---@field get_env_var fun(path: string): table<string,string>
 
----@class InterpreterInfo
----@field locator Locator
----@field interpreter_path string
-
 ---@type table<string, Locator>
 local locators = {}
 
@@ -45,18 +41,38 @@ end
 M.iterate = function(on_result)
   for _, locator in pairs(locators) do
     for interpreter_info in locator:find() do
-      setmetatable(interpreter_info, {
-        __tostring = function(t)
-          return string.format(
-            "(%s) %s",
-            t.locator.display_name,
-            vim.fn.fnamemodify(t.interpreter_path, ":p:~:.")
-          )
-        end,
-      })
       on_result(interpreter_info)
     end
   end
+end
+
+---@class InterpreterInfo
+---@field locator_name Locator
+---@field path string
+---@field env_var table<string,string>
+M.InterpreterInfo = {}
+
+---@param opts any
+---@return InterpreterInfo
+function M.InterpreterInfo:new(opts)
+  return setmetatable({
+    locator_name = opts.locator.name,
+    path = opts.path,
+  }, {
+    __tostring = function(tbl)
+      return string.format(
+        "(%s) %s",
+        opts.locator.display_name,
+        vim.fn.fnamemodify(tbl.path, ":p:~:.")
+      )
+    end,
+    __index = function(tbl, key)
+      if key == "env_var" then
+        return opts.locator.get_env_var_strategy(tbl.path)
+      end
+      return nil
+    end,
+  })
 end
 
 return M

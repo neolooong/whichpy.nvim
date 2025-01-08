@@ -3,13 +3,14 @@ local get_interpreter_path = util.get_interpreter_path
 local get_env_var_strategy = require("whichpy.locator._common").get_env_var_strategy
 local get_global_virtual_environment_dirs =
   require("whichpy.locator._common").get_global_virtual_environment_dirs
+local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
 local _opts = {}
 
 local Locator = {
   name = "global_virtual_environment",
   display_name = "Global Virtual Environemnt",
-  get_env_var = get_env_var_strategy.guess,
+  get_env_var_strategy = get_env_var_strategy.virtual_env,
 }
 
 function Locator.merge_opts(opts)
@@ -29,9 +30,9 @@ function Locator:find()
           break
         end
         if t == "directory" then
-          local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
-          if vim.uv.fs_stat(interpreter_path) then
-            coroutine.yield({ locator = self, interpreter_path = interpreter_path })
+          local path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
+          if vim.uv.fs_stat(path) then
+            coroutine.yield(InterpreterInfo:new({ locator = self, path = path }))
           end
         end
       end
