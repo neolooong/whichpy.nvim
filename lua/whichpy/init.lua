@@ -1,7 +1,5 @@
 local M = {}
 
-M.locators = {}
-
 ---@param opts WhichPy.Config
 M.setup = function(opts)
   require("whichpy.config").setup_config(opts or {})
