@@ -1,14 +1,13 @@
 local get_interpreter_path = require("whichpy.util").get_interpreter_path
-local asystem = require("whichpy.async").asystem
+local get_env_var_strategy = require("whichpy.locator._common").get_env_var_strategy
+local get_pdm_venv_location = require("whichpy.locator._common").get_pdm_venv_location
+local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
-local get_pdm_venv_location = function()
-  local ok, res = asystem({ "pdm", "config", "venv.location" }, {})
-  if ok and res.code == 0 then
-    return vim.trim(res.stdout)
-  end
-end
-
-local Locator = { name = "pdm", display_name = "PDM" }
+local Locator = {
+  name = "pdm",
+  display_name = "PDM",
+  get_env_var_strategy = get_env_var_strategy.virtual_env,
+}
 
 function Locator:find()
   local dir = get_pdm_venv_location()
@@ -20,17 +19,13 @@ function Locator:find()
 
     for name, t in vim.fs.dir(dir) do
       if t == "directory" then
-        local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
-        if vim.uv.fs_stat(interpreter_path) then
-          coroutine.yield({ locator = self, interpreter_path = interpreter_path })
+        local path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
+        if vim.uv.fs_stat(path) then
+          coroutine.yield(InterpreterInfo:new({ locator = self, path = path }))
         end
       end
     end
   end)
-end
-
-function Locator:determine_env_var(path)
-  return "VIRTUAL_ENV", vim.fs.dirname(vim.fs.dirname(path))
 end
 
 return Locator

@@ -1,21 +1,15 @@
 local util = require("whichpy.util")
 local is_win = util.is_win
 local get_interpreter_path = util.get_interpreter_path
-local asystem = require("whichpy.async").asystem
+local get_env_var_strategy = require("whichpy.locator._common").get_env_var_strategy
+local get_conda_info = require("whichpy.locator._common").get_conda_info
+local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
-local get_conda_info = function()
-  local ok, res = asystem({ "conda", "info", "--json" }, {})
-
-  if ok and res.code == 0 then
-    return res.stdout
-  end
-end
-
-local get_conda_envs = function(info)
-  return vim.json.decode(info).envs
-end
-
-local Locator = { name = "conda", display_name = "Conda" }
+local Locator = {
+  name = "conda",
+  display_name = "Conda",
+  get_env_var_strategy = get_env_var_strategy.conda,
+}
 
 function Locator:find()
   local conda_info = get_conda_info()
@@ -24,23 +18,14 @@ function Locator:find()
     if not conda_info then
       return
     end
-    local envs = get_conda_envs(conda_info)
 
-    for _, env in ipairs(envs) do
-      local interpreter_path = get_interpreter_path(env, is_win and "root" or "bin")
-      if vim.uv.fs_stat(interpreter_path) then
-        coroutine.yield({ locator = self, interpreter_path = interpreter_path })
+    for _, env in ipairs(conda_info.envs) do
+      local path = get_interpreter_path(env, is_win and "root" or "bin")
+      if vim.uv.fs_stat(path) then
+        coroutine.yield(InterpreterInfo:new({ locator = self, path = path }))
       end
     end
   end)
-end
-
-function Locator:determine_env_var(path)
-  local prefix = vim.fs.dirname(path)
-  if not is_win then
-    prefix = vim.fs.dirname(prefix)
-  end
-  return "CONDA_PREFIX", prefix
 end
 
 return Locator

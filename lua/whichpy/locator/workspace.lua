@@ -1,8 +1,14 @@
 local get_interpreter_path = require("whichpy.util").get_interpreter_path
+local get_env_var_strategy = require("whichpy.locator._common").get_env_var_strategy
+local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
 local _opts = {}
 
-local Locator = { name = "workspace", display_name = "Workspace" }
+local Locator = {
+  name = "workspace",
+  display_name = "Workspace",
+  get_env_var_strategy = get_env_var_strategy.virtual_env,
+}
 
 function Locator.merge_opts(opts)
   _opts = vim.tbl_deep_extend("force", _opts, opts or {})
@@ -20,11 +26,11 @@ function Locator:find()
           break
         end
         if t == "directory" then
-          local interpreter_path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
+          local path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
 
           if not vim.list_contains(_opts.ignore_dirs, name) then
-            if name:match(_opts.search_pattern) and vim.uv.fs_stat(interpreter_path) then
-              coroutine.yield({ locator = self, interpreter_path = interpreter_path })
+            if name:match(_opts.search_pattern) and vim.uv.fs_stat(path) then
+              coroutine.yield(InterpreterInfo:new({ locator = self, path = path }))
             elseif depth < _opts.depth then
               dirs[#dirs + 1] = { vim.fs.joinpath(dir, name), depth + 1 }
             end
@@ -33,10 +39,6 @@ function Locator:find()
       end
     end
   end)
-end
-
-function Locator:determine_env_var(path)
-  return "VIRTUAL_ENV", vim.fs.dirname(vim.fs.dirname(path))
 end
 
 return Locator
