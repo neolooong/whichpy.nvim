@@ -1,5 +1,6 @@
 local util = require("whichpy.util")
 local is_win = util.is_win
+local config = require("whichpy.config").config
 local asystem = require("whichpy.async").asystem
 
 local M = {}
@@ -77,10 +78,17 @@ function M.get_search_path_entries()
     dirs = vim.list_extend(dirs, common_posix_bin_paths)
   end
   local pyenv_shims = M.get_pyenv_shims_dir()
+  local exclude_path
+  if config.update_path_env then
+    local selected_path = require("whichpy.envs").current_selected()
+    if selected_path ~= nil then
+      exclude_path = vim.fs.dirname(selected_path)
+    end
+  end
   dirs = vim
     .iter(dirs)
     :filter(function(dir)
-      return dir ~= pyenv_shims
+      return dir ~= pyenv_shims or (exclude_path ~= nil and dir ~= exclude_path)
     end)
     :map(function(dir)
       return vim.fn.fnamemodify(dir, ":p")
@@ -108,7 +116,6 @@ end
 function M.get_workspace_folders()
   local hash = {}
   local res = {}
-  local config = require("whichpy.config").config
   for lsp_name, _ in pairs(config.lsp) do
     local client = vim.lsp.get_clients({ name = lsp_name })[1]
     if client ~= nil then
