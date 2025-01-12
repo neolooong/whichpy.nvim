@@ -8,7 +8,7 @@ local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 local Locator = {
   name = "conda",
   display_name = "Conda",
-  get_env_var_strategy = get_env_var_strategy.conda,
+  get_env_var_strategy = get_env_var_strategy.conda_prefix,
 }
 
 function Locator:find()
