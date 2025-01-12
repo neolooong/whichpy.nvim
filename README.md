@@ -14,7 +14,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
 - Support multiple pickers. (`builtin`, `fzf-lua`, `telescope`)
 - Automatically select the previously chosen interpreter based on the directory.
 - Search on common directories, currently support:
-  - workspace (relative path of `vim.fn.getcwd()`)
+  - workspace (`lsp.WorkspaceFolder` or `vim.fs.root` or `vim.fn.getcwd`)
   - global (`vim.env.Path` and common posix paths)
   - global virtual environment
   - pyenv

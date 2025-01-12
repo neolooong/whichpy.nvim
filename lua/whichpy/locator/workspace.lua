@@ -1,6 +1,7 @@
 local get_interpreter_path = require("whichpy.util").get_interpreter_path
 local get_env_var_strategy = require("whichpy.locator._common").get_env_var_strategy
 local InterpreterInfo = require("whichpy.locator").InterpreterInfo
+local get_workspace_folders = require("whichpy.locator._common").get_workspace_folders
 
 local _opts = {}
 
@@ -15,8 +16,14 @@ function Locator.merge_opts(opts)
 end
 
 function Locator:find()
+  local dirs = vim
+    .iter(get_workspace_folders())
+    :map(function(dir)
+      return { dir, 1 }
+    end)
+    :totable()
+
   return coroutine.wrap(function()
-    local dirs = { { vim.fn.getcwd(), 1 } }
     while #dirs > 0 do
       local dir, depth = unpack(table.remove(dirs, 1))
       local fs = vim.uv.fs_scandir(dir)

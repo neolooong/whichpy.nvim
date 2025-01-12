@@ -105,6 +105,28 @@ function M.get_global_virtual_environment_dirs(opts_dirs)
   return util.deduplicate(dirs)
 end
 
+function M.get_workspace_folders()
+  local hash = {}
+  local res = {}
+  local config = require("whichpy.config").config
+  for lsp_name, _ in pairs(config.lsp) do
+    local client = vim.lsp.get_clients({ name = lsp_name })[1]
+    if client ~= nil then
+      for _, val in ipairs(client.config.workspace_folders) do
+        if hash[val.name] == nil then
+          hash[val.name] = true
+          table.insert(res, val.name)
+        end
+      end
+    end
+  end
+  if #res > 0 then
+    return res
+  end
+  table.insert(res, vim.fs.root(0, { "pyproject.toml", "setup.py", ".git" }) or vim.fn.getcwd())
+  return res
+end
+
 M.get_env_var_strategy = {}
 
 function M.get_env_var_strategy.conda_prefix(python_path)
