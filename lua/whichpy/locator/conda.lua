@@ -5,11 +5,20 @@ local get_env_var_strategy = require("whichpy.locator._common").get_env_var_stra
 local get_conda_info = require("whichpy.locator._common").get_conda_info
 local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
-local Locator = {
-  name = "conda",
-  display_name = "Conda",
-  get_env_var_strategy = get_env_var_strategy.conda_prefix,
-}
+---@class WhichPy.Locator.Conda: WhichPy.Locator
+
+---@class WhichPy.Locator.Conda.Opts
+
+local Locator = { name = "conda" }
+Locator.__index = Locator
+
+function Locator.new(opts)
+  local obj = vim.tbl_deep_extend("force", {
+    display_name = "Conda",
+    get_env_var_strategy = get_env_var_strategy.conda_prefix,
+  }, opts or {})
+  return setmetatable(obj, Locator)
+end
 
 function Locator:find()
   local conda_info = get_conda_info()

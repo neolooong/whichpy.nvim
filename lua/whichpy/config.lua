@@ -4,7 +4,7 @@
 ---@field lsp? table<string,WhichPy.Lsp.Handler>
 ---@field picker? WhichPy.Config.Picker
 ---@field update_path_env? boolean
----@field after_handle_select? fun(selected: InterpreterInfo)
+---@field after_handle_select? fun(selected: WhichPy.InterpreterInfo)
 
 ---@class (exact) WhichPy.Config.Locator
 ---@field workspace? WhichPy.Config.Locator.Workspace
@@ -15,23 +15,13 @@
 ---@field pdm? WhichPy.Config.Locator.Pdm
 ---@field conda? WhichPy.Config.Locator.Conda
 
----@class (exact) WhichPy.Config.Locator.Workspace
----@field search_pattern? string
----@field depth? integer
----@field ignore_dirs? string[]
-
----@class (exact) WhichPy.Config.Locator.Global
-
----@class (exact) WhichPy.Config.Locator.GlobalVirtualEnvironment
----@field dirs? (string|{[1]: string, [2]: string})[]
-
----@class (exact) WhichPy.Config.Locator.Pyenv
-
----@class (exact) WhichPy.Config.Locator.Poetry
-
----@class (exact) WhichPy.Config.Locator.Pdm
-
----@class (exact) WhichPy.Config.Locator.Conda
+---@alias WhichPy.Config.Locator.Workspace WhichPy.Locator.Opts|WhichPy.Locator.Workspace.Opts
+---@alias WhichPy.Config.Locator.Global WhichPy.Locator.Opts|WhichPy.Locator.Global.Opts
+---@alias WhichPy.Config.Locator.GlobalVirtualEnvironment WhichPy.Locator.Opts|WhichPy.Locator.GlobalVirtualEnvironment.Opts
+---@alias WhichPy.Config.Locator.Pyenv WhichPy.Locator.Opts|WhichPy.Locator.Pyenv.Opts
+---@alias WhichPy.Config.Locator.Poetry WhichPy.Locator.Opts|WhichPy.Locator.Poetry.Opts
+---@alias WhichPy.Config.Locator.Pdm WhichPy.Locator.Opts|WhichPy.Locator.Pdm.Opts
+---@alias WhichPy.Config.Locator.Conda WhichPy.Locator.Opts|WhichPy.Locator.Conda.Opts
 
 ---@class WhichPy.Config.Picker
 ---@field name? "builtin"|"fzf-lua"|"telescope"
@@ -45,30 +35,9 @@ local _default_config = {
   picker = { name = "builtin" },
   update_path_env = false,
   locator = {
-    workspace = {
-      search_pattern = ".*env.*",
-      depth = 2,
-      ignore_dirs = {
-        ".git",
-        ".mypy_cache",
-        ".pytest_cache",
-        ".ruff_cache",
-        "__pycache__",
-        "__pypackages__",
-      },
-    },
+    workspace = {},
     global = {},
-    global_virtual_environment = {
-      dirs = {
-        "~/envs",
-        "~/.direnv",
-        "~/.venvs",
-        "~/.virtualenvs",
-        "~/.local/share/virtualenvs",
-        { "~/Envs", "Windows_NT" },
-        vim.env.WORKON_HOME,
-      },
-    },
+    global_virtual_environment = {},
     pyenv = {},
     poetry = {},
     pdm = {},

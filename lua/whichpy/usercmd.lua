@@ -16,7 +16,7 @@ local subcommand_tbl = {
           util.notify(python_path .. " doesn't exists.")
         else
           require("whichpy.envs").handle_select(InterpreterInfo:new({
-            locator = require("whichpy.locator.global"),
+            locator = require("whichpy.locator").get_locator("global"),
             path = python_path,
           }))
         end

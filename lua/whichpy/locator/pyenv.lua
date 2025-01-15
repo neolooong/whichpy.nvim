@@ -4,11 +4,20 @@ local get_env_var_strategy = require("whichpy.locator._common").get_env_var_stra
 local get_pyenv_version_dir = require("whichpy.locator._common").get_pyenv_version_dir
 local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
-local Locator = {
-  name = "pyenv",
-  display_name = "Pyenv",
-  get_env_var_strategy = get_env_var_strategy.virtual_env,
-}
+---@class WhichPy.Locator.Pyenv: WhichPy.Locator
+
+---@class WhichPy.Locator.Pyenv.Opts
+
+local Locator = {name = "pyenv"}
+Locator.__index = Locator
+
+function Locator.new(opts)
+  local obj = vim.tbl_deep_extend("force", {
+    display_name = "Pyenv",
+    get_env_var_strategy = get_env_var_strategy.virtual_env,
+  }, opts or {})
+  return setmetatable(obj, Locator)
+end
 
 function Locator:find()
   return coroutine.wrap(function()

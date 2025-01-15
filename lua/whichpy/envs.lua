@@ -28,7 +28,7 @@ M.show_selector = function()
   require("whichpy.picker")[config.picker.name]:show()
 end
 
----@param selected InterpreterInfo
+---@param selected WhichPy.InterpreterInfo
 ---@param should_cache? boolean
 M.handle_select = function(selected, should_cache)
   local should_backup_original = orig_interpreter_path == nil
@@ -168,7 +168,7 @@ M.retrieve_cache = function()
 
   M.handle_select(
     InterpreterInfo:new({
-      locator = require("whichpy.locator." .. (lines[2] or "global")),
+      locator = require("whichpy.locator").get_locator(lines[2] or "global"),
       path = lines[1],
     }),
     false

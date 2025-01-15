@@ -3,11 +3,20 @@ local get_env_var_strategy = require("whichpy.locator._common").get_env_var_stra
 local get_pdm_venv_location = require("whichpy.locator._common").get_pdm_venv_location
 local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
-local Locator = {
-  name = "pdm",
-  display_name = "PDM",
-  get_env_var_strategy = get_env_var_strategy.virtual_env,
-}
+---@class WhichPy.Locator.Pdm: WhichPy.Locator
+
+---@class WhichPy.Locator.Pdm.Opts
+
+local Locator = { name = "pdm" }
+Locator.__index = Locator
+
+function Locator.new(opts)
+  local obj = vim.tbl_deep_extend("force", {
+    display_name = "PDM",
+    get_env_var_strategy = get_env_var_strategy.virtual_env,
+  }, opts or {})
+  return setmetatable(obj, Locator)
+end
 
 function Locator:find()
   local dir = get_pdm_venv_location()
