@@ -21,7 +21,7 @@ M.get_envs = function()
   if SearchJob:status() == "dead" then
     return final_envs
   end
-  return SearchJob:_temp_envs()
+  return SearchJob._temp_envs
 end
 
 M.show_selector = function()
