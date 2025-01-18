@@ -39,16 +39,6 @@ function M.get_locator(locator_name)
   return locator.new(opts)
 end
 
----@param on_result function
-M.iterate = function(on_result)
-  for _, locator in pairs(M.locators) do
-    ---@diagnostic disable-next-line: undefined-field
-    for interpreter_info in locator:find() do
-      on_result(interpreter_info)
-    end
-  end
-end
-
 ---@class WhichPy.InterpreterInfo
 ---@field locator_name WhichPy.Locator
 ---@field path string

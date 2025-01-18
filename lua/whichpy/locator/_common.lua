@@ -1,31 +1,8 @@
 local util = require("whichpy.util")
 local is_win = util.is_win
 local config = require("whichpy.config").config
-local asystem = require("whichpy.async").asystem
 
 local M = {}
-
-function M.get_conda_info()
-  local ok, res = asystem({ "conda", "info", "--json" }, {})
-
-  if ok and res.code == 0 then
-    return vim.json.decode(res.stdout)
-  end
-end
-
-function M.get_pdm_venv_location()
-  local ok, res = asystem({ "pdm", "config", "venv.location" }, {})
-  if ok and res.code == 0 then
-    return vim.trim(res.stdout)
-  end
-end
-
-function M.get_poetry_virtualenvs_path()
-  local ok, res = asystem({ "poetry", "config", "virtualenvs.path" }, {})
-  if ok and res.code == 0 then
-    return vim.trim(res.stdout)
-  end
-end
 
 function M.get_pyenv_dir()
   local pyenv_root = is_win and os.getenv("PYENV") or os.getenv("PYENV_ROOT")

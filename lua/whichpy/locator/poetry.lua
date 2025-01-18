@@ -1,6 +1,5 @@
 local get_interpreter_path = require("whichpy.util").get_interpreter_path
 local get_env_var_strategy = require("whichpy.locator._common").get_env_var_strategy
-local get_poetry_virtualenvs_path = require("whichpy.locator._common").get_poetry_virtualenvs_path
 local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
 ---@class WhichPy.Locator.Poetry: WhichPy.Locator
@@ -18,14 +17,35 @@ function Locator.new(opts)
   return setmetatable(obj, Locator)
 end
 
-function Locator:find()
-  local dir = get_poetry_virtualenvs_path()
-
+function Locator:find(Job)
   return coroutine.wrap(function()
-    if not dir then
+    if not vim.fn.executable("poetry") then
       return
     end
 
+    vim.system({ "poetry", "config", "virtualenvs.path" }, {}, function(out)
+      local ctx = { locator_name = self.name }
+
+      if out.code ~= 0 then
+        ctx.err = "poetry command error"
+      else
+        local dir = vim.trim(out.stdout)
+        if dir ~= "" then
+          ctx.co = function()
+            return self:_find(dir)
+          end
+        end
+      end
+
+      Job:continue(ctx)
+    end)
+
+    coroutine.yield({ locator_name = self.name, wait = true })
+  end)
+end
+
+function Locator:_find(dir)
+  return coroutine.wrap(function()
     for name, t in vim.fs.dir(dir) do
       if t == "directory" then
         local path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
