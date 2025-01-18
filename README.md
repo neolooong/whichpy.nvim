@@ -69,9 +69,10 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
       -- },
     },
     locator = {
-      -- you can disable locator like this
+      -- You can disable locator like this
       -- locator_name = { enable = false },
       workspace = {
+        display_name = "Workspace",
         search_pattern = ".*env.*", -- `:help lua-patterns`
         depth = 2,
         ignore_dirs = {
@@ -83,8 +84,11 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
           "__pypackages__",
         },
       },
-      global = {},
+      global = {
+        display_name = "Global",
+      },
       global_virtual_environment = {
+        display_name = "Global Virtual Environment",
         dirs = {
           -- accept following structure
           -- path
@@ -98,10 +102,18 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
           vim.env.WORKON_HOME,
         }
       },
-      pyenv = {},
-      poetry = {},
-      pdm = {},
-      conda = {},
+      pyenv = {
+        display_name = "Pyenv",
+      },
+      poetry = {
+        display_name = "Poetry",
+      },
+      pdm = {
+        display_name = "PDM",
+      },
+      conda = {
+        display_name = "Conda",
+      },
     },
     lsp = {
       pylsp = require("whichpy.lsp.handlers.pylsp"),
@@ -171,5 +183,4 @@ This plugin provide these commands:
 
 - [venv-selector.nvim](https://github.com/linux-cultist/venv-selector.nvim) for inspiring the Python path setup.
 - [vscode-python](https://github.com/microsoft/vscode-python) for numerous locator implementation.
-- [async.nvim](https://github.com/lewis6991/async.nvim) for the async implementation.
 - and many publicly shared dotfiles on Github.
