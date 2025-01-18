@@ -4,11 +4,20 @@ local get_env_var_strategy = require("whichpy.locator._common").get_env_var_stra
 local get_search_path_entries = require("whichpy.locator._common").get_search_path_entries
 local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
-local Locator = {
-  name = "global",
-  display_name = "Global",
-  get_env_var_strategy = get_env_var_strategy.guess,
-}
+---@class WhichPy.Locator.Global: WhichPy.Locator
+
+---@class WhichPy.Locator.Global.Opts
+
+local Locator = { name = "global" }
+Locator.__index = Locator
+
+function Locator.new(opts)
+  local obj = vim.tbl_deep_extend("force", {
+    display_name = "Global",
+    get_env_var_strategy = get_env_var_strategy.guess,
+  }, opts or {})
+  return setmetatable(obj, Locator)
+end
 
 function Locator:find()
   return coroutine.wrap(function()

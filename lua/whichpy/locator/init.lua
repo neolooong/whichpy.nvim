@@ -1,22 +1,18 @@
----@class Locator
----@field name string
----@field display_name string
----@field merge_opts? fun(opts: table)
----@field find fun(): async fun(): InterpreterInfo
----@field get_env_var fun(path: string): table<string,string>
+local config = require("whichpy.config").config
 
----@type table<string, Locator>
-local locators = {}
+---@class WhichPy.Locator
+---@field private name string
+---@field display_name string
+---@field get_env_var_strategy fun(path: string): table<string,string>
+
+---@class WhichPy.Locator.Opts
+---@field display_name? string
+---@field get_env_var_strategy? fun(path: string): table<string,string>
 
 local M = {}
-setmetatable(M, {
-  __index = function(_, key)
-    local ok, locator = pcall(require, "whichpy.locator." .. key)
-    if ok then
-      return locator
-    end
-  end,
-})
+
+---@type table<string, WhichPy.Locator>
+M.locators = {}
 
 ---@param locator_name string
 ---@param locator_opts table
@@ -25,35 +21,32 @@ M.setup_locator = function(locator_name, locator_opts)
     return
   end
 
-  ---@type Locator?
-  local locator = M[locator_name]
-  if not locator then
+  local ok, locator = pcall(require, "whichpy.locator." .. locator_name)
+  if not ok then
     return
   end
 
-  if locator.merge_opts then
-    locator.merge_opts(locator_opts)
-  end
-  locators[locator_name] = locator
+  M.locators[locator_name] = locator.new(locator_opts)
 end
 
----@param on_result function
-M.iterate = function(on_result)
-  for _, locator in pairs(locators) do
-    for interpreter_info in locator:find() do
-      on_result(interpreter_info)
-    end
+function M.get_locator(locator_name)
+  local ok, locator = pcall(require, "whichpy.locator." .. locator_name)
+  if not ok then
+    return
   end
+  local opts = config.locator[locator_name] or {}
+  opts.enable = nil
+  return locator.new(opts)
 end
 
----@class InterpreterInfo
----@field locator_name Locator
+---@class WhichPy.InterpreterInfo
+---@field locator_name WhichPy.Locator
 ---@field path string
 ---@field env_var table<string,string>
 M.InterpreterInfo = {}
 
 ---@param opts any
----@return InterpreterInfo
+---@return WhichPy.InterpreterInfo
 function M.InterpreterInfo:new(opts)
   return setmetatable({
     locator_name = opts.locator.name,

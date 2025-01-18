@@ -5,21 +5,35 @@ local get_global_virtual_environment_dirs =
   require("whichpy.locator._common").get_global_virtual_environment_dirs
 local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
-local _opts = {}
+---@class WhichPy.Locator.GlobalVirtualEnvironment: WhichPy.Locator
+---@field dirs (string|{[1]: string, [2]: string})[]
 
-local Locator = {
-  name = "global_virtual_environment",
-  display_name = "Global Virtual Environemnt",
-  get_env_var_strategy = get_env_var_strategy.virtual_env,
-}
+---@class WhichPy.Locator.GlobalVirtualEnvironment.Opts
+---@field dirs? (string|{[1]: string, [2]: string})[]
 
-function Locator.merge_opts(opts)
-  _opts = vim.tbl_deep_extend("force", _opts, opts or {})
+local Locator = { name = "global_virtual_environment" }
+Locator.__index = Locator
+
+function Locator.new(opts)
+  local obj = vim.tbl_deep_extend("force", {
+    display_name = "Global Virtual Environemnt",
+    get_env_var_strategy = get_env_var_strategy.virtual_env,
+    dirs = {
+      "~/envs",
+      "~/.direnv",
+      "~/.venvs",
+      "~/.virtualenvs",
+      "~/.local/share/virtualenvs",
+      { "~/Envs", "Windows_NT" },
+      vim.env.WORKON_HOME,
+    },
+  }, opts or {})
+  return setmetatable(obj, Locator)
 end
 
 function Locator:find()
   return coroutine.wrap(function()
-    local dirs = get_global_virtual_environment_dirs(_opts.dirs)
+    local dirs = get_global_virtual_environment_dirs(self.dirs)
 
     while #dirs > 0 do
       local dir = table.remove(dirs, 1)

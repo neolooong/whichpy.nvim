@@ -14,10 +14,12 @@ function Picker:setup()
 end
 
 function Picker:_show(opts, envs)
-  vim.ui.select(envs, opts, function(choice)
-    if choice ~= nil then
-      handle_select(choice)
-    end
+  vim.schedule(function()
+    vim.ui.select(envs, opts, function(choice)
+      if choice ~= nil then
+        handle_select(choice)
+      end
+    end)
   end)
 end
 
