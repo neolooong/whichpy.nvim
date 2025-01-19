@@ -114,12 +114,21 @@ end
 
 M.get_env_var_strategy = {}
 
-function M.get_env_var_strategy.conda_prefix(python_path)
+function M.get_env_var_strategy.conda(python_path)
   local prefix = vim.fs.dirname(python_path)
   if not is_win then
     prefix = vim.fs.dirname(prefix)
   end
   return { name = "CONDA_PREFIX", val = prefix }
+end
+
+function M.get_env_var_strategy.pyenv(python_path)
+  local venv = vim.fs.dirname(vim.fs.dirname(python_path))
+  local pyvenv_cfg = vim.fs.joinpath(venv, "pyvenv.cfg")
+  if vim.uv.fs_stat(pyvenv_cfg) then
+    return { name = "VIRTUAL_ENV", val = venv }
+  end
+  return {}
 end
 
 function M.get_env_var_strategy.virtual_env(python_path)

@@ -14,7 +14,7 @@ Locator.__index = Locator
 function Locator.new(opts)
   local obj = vim.tbl_deep_extend("force", {
     display_name = "Conda",
-    get_env_var_strategy = get_env_var_strategy.conda_prefix,
+    get_env_var_strategy = get_env_var_strategy.conda,
   }, opts or {})
   return setmetatable(obj, Locator)
 end

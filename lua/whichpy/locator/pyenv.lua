@@ -14,7 +14,7 @@ Locator.__index = Locator
 function Locator.new(opts)
   local obj = vim.tbl_deep_extend("force", {
     display_name = "Pyenv",
-    get_env_var_strategy = get_env_var_strategy.virtual_env,
+    get_env_var_strategy = get_env_var_strategy.pyenv,
   }, opts or {})
   return setmetatable(obj, Locator)
 end
