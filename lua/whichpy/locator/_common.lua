@@ -96,7 +96,7 @@ function M.get_workspace_folders()
   local res = {}
   for lsp_name, _ in pairs(config.lsp) do
     local client = vim.lsp.get_clients({ name = lsp_name })[1]
-    if client ~= nil then
+    if client ~= nil and client.config ~= nil and client.config.workspace_folders ~= nil then
       for _, val in ipairs(client.config.workspace_folders) do
         if hash[val.name] == nil then
           hash[val.name] = true
