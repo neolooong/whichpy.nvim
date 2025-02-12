@@ -114,6 +114,10 @@ end
 
 M.get_env_var_strategy = {}
 
+function M.get_env_var_strategy.no()
+  return {}
+end
+
 function M.get_env_var_strategy.conda(python_path)
   local prefix = vim.fs.dirname(python_path)
   if not is_win then

@@ -14,6 +14,7 @@
 ---@field poetry? WhichPy.Config.Locator.Poetry
 ---@field pdm? WhichPy.Config.Locator.Pdm
 ---@field conda? WhichPy.Config.Locator.Conda
+---@field uv? WhichPy.Config.Locator.Uv
 
 ---@alias WhichPy.Config.Locator.Workspace WhichPy.Locator.Opts|WhichPy.Locator.Workspace.Opts
 ---@alias WhichPy.Config.Locator.Global WhichPy.Locator.Opts|WhichPy.Locator.Global.Opts
@@ -22,6 +23,7 @@
 ---@alias WhichPy.Config.Locator.Poetry WhichPy.Locator.Opts|WhichPy.Locator.Poetry.Opts
 ---@alias WhichPy.Config.Locator.Pdm WhichPy.Locator.Opts|WhichPy.Locator.Pdm.Opts
 ---@alias WhichPy.Config.Locator.Conda WhichPy.Locator.Opts|WhichPy.Locator.Conda.Opts
+---@alias WhichPy.Config.Locator.Uv WhichPy.Locator.Opts|WhichPy.Locator.Uv.Opts
 
 ---@class WhichPy.Config.Picker
 ---@field name? "builtin"|"fzf-lua"|"telescope"

@@ -21,6 +21,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
   - poetry
   - pdm
   - conda
+  - uv
 
 ## Requirements
 
@@ -115,6 +116,9 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
       conda = {
         display_name = "Conda",
       },
+      -- uv = {  -- disabled by default
+      --   display_name = "uv",
+      -- },
     },
     lsp = {
       pylsp = require("whichpy.lsp.handlers.pylsp"),
