@@ -104,6 +104,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
       },
       pyenv = {
         display_name = "Pyenv",
+        venv_only = true,
       },
       poetry = {
         display_name = "Poetry",

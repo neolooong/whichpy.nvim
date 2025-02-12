@@ -7,14 +7,16 @@ local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 ---@class WhichPy.Locator.Pyenv: WhichPy.Locator
 
 ---@class WhichPy.Locator.Pyenv.Opts
+---@field venv_only? boolean
 
-local Locator = {name = "pyenv"}
+local Locator = { name = "pyenv" }
 Locator.__index = Locator
 
 function Locator.new(opts)
   local obj = vim.tbl_deep_extend("force", {
     display_name = "Pyenv",
     get_env_var_strategy = get_env_var_strategy.pyenv,
+    venv_only = true,
   }, opts or {})
   return setmetatable(obj, Locator)
 end
@@ -27,7 +29,9 @@ function Locator:find()
       if t == "directory" then
         local path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
         if vim.uv.fs_stat(path) then
-          coroutine.yield(InterpreterInfo:new({ locator = self, path = path }))
+          if not self.venv_only then
+            coroutine.yield(InterpreterInfo:new({ locator = self, path = path }))
+          end
 
           local envs_dir = vim.fs.joinpath(dir, name, "envs")
 
