@@ -5,6 +5,7 @@ local SearchJob = require("whichpy.search")
 local final_envs = {}
 local orig_interpreter_path
 local curr_interpreter_path
+local curr_env_explicitly_set
 local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
 local M = {}
@@ -30,10 +31,12 @@ end
 
 ---@param selected WhichPy.InterpreterInfo
 ---@param should_cache? boolean
-M.handle_select = function(selected, should_cache)
+---@param explicitly_set? boolean
+M.handle_select = function(selected, should_cache, explicitly_set)
   local should_backup_original = orig_interpreter_path == nil
   local _orig_interpreter_path = {}
   should_cache = should_cache == nil or should_cache
+  explicitly_set = explicitly_set == nil or explicitly_set
 
   if should_backup_original then
     _orig_interpreter_path["lsp"] = {}
@@ -106,6 +109,7 @@ M.handle_select = function(selected, should_cache)
     orig_interpreter_path = _orig_interpreter_path
   end
   curr_interpreter_path = selected.path
+  curr_env_explicitly_set = explicitly_set
 
   if config.after_handle_select then
     config.after_handle_select(selected)
@@ -171,12 +175,17 @@ M.retrieve_cache = function()
       locator = require("whichpy.locator").get_locator(lines[2] or "global"),
       path = lines[1],
     }),
+    false,
     false
   )
 end
 
 M.current_selected = function()
   return curr_interpreter_path
+end
+
+M.current_selected_explicitly = function()
+  return curr_env_explicitly_set
 end
 
 return M
