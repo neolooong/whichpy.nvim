@@ -1,3 +1,7 @@
+local is_pylsp_jedi_environment_check = false
+local pylsp_jedi_environment_default = nil
+local pylsp_jedi_environment_origin = nil
+local is_pylsp_mypy_overrides_check = false
 local pylsp_mypy_overrides_default = { true }
 local pylsp_mypy_overrides_origin = nil
 
@@ -14,7 +18,21 @@ local M = {
     return nil
   end,
   set_python_path = function(client, python_path)
-    if pylsp_mypy_overrides_origin == nil then
+    if not is_pylsp_jedi_environment_check then
+      is_pylsp_jedi_environment_check = true
+      if
+        client.settings.pylsp
+        and client.settings.pylsp.plugins
+        and client.settings.pylsp.plugins.jedi
+      then
+        pylsp_jedi_environment_origin = client.settings.pylsp.plugins.jedi.environment
+      else
+        pylsp_jedi_environment_origin = pylsp_jedi_environment_default
+      end
+    end
+
+    if not is_pylsp_mypy_overrides_check then
+      is_pylsp_mypy_overrides_check = true
       if client.settings.pylsp.plugins and client.settings.pylsp.plugins.pylsp_mypy then
         pylsp_mypy_overrides_origin = client.settings.pylsp.plugins.pylsp_mypy.overrides
           or pylsp_mypy_overrides_default
@@ -27,9 +45,11 @@ local M = {
       local pylsp_mypy_overrides
 
       local option_name = "--python-executable"
+      ---@diagnostic disable-next-line: param-type-mismatch
       if vim.tbl_contains(pylsp_mypy_overrides_origin, option_name) then
         pylsp_mypy_overrides = {}
         local option_value_index = 0
+        ---@diagnostic disable-next-line: param-type-mismatch
         for index, value in ipairs(pylsp_mypy_overrides_origin) do
           if value == option_name then
             option_value_index = index + 1
@@ -58,7 +78,7 @@ local M = {
         },
       })
     else
-      client.settings.pylsp.plugins.jedi.environment = nil
+      client.settings.pylsp.plugins.jedi.environment = pylsp_jedi_environment_origin
       client.settings.pylsp.plugins.pylsp_mypy.overrides = pylsp_mypy_overrides_origin
         or pylsp_mypy_overrides_default
     end
