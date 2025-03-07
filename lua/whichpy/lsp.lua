@@ -25,7 +25,7 @@ function M.create_autocmd()
       local selected = require("whichpy.envs").current_selected()
       local selected_explicitly = require("whichpy.envs").current_selected_explicitly()
       if next(M._clients) == nil and (selected == nil or
-                (config.auto_select_on_current_implicit and not selected_explicitly)) then
+                (config.auto_select_when_current_implicit and not selected_explicitly)) then
         require("whichpy.envs").retrieve_cache()
       elseif M._clients[client_name] ~= client_id and selected ~= nil then
         config.lsp[client_name].set_python_path(client, selected)

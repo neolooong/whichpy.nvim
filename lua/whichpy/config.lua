@@ -4,7 +4,7 @@
 ---@field lsp? table<string,WhichPy.Lsp.Handler>
 ---@field picker? WhichPy.Config.Picker
 ---@field update_path_env? boolean
----@field auto_select_if_not_selected? boolean
+---@field auto_select_when_current_implicit? boolean
 ---@field after_handle_select? fun(selected: WhichPy.InterpreterInfo)
 
 ---@class (exact) WhichPy.Config.Locator
