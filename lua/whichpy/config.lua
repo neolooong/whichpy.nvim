@@ -46,9 +46,9 @@ local _default_config = {
     conda = {},
   },
   lsp = {
-    pylsp = require("whichpy.lsp.handlers.pylsp"),
-    pyright = require("whichpy.lsp.handlers.pyright"),
-    basedpyright = require("whichpy.lsp.handlers.pyright"),
+    pylsp = require("whichpy.lsp.handlers.pylsp").new(),
+    pyright = require("whichpy.lsp.handlers.pyright").new(),
+    basedpyright = require("whichpy.lsp.handlers.pyright").new(),
   },
   after_handle_select = nil,
 }

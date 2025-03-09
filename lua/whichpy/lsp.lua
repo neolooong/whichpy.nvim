@@ -26,7 +26,10 @@ function M.create_autocmd()
       if next(M._clients) == nil and selected == nil then
         require("whichpy.envs").retrieve_cache()
       elseif M._clients[client_name] ~= client_id and selected ~= nil then
-        config.lsp[client_name].set_python_path(client, selected)
+        if M._clients[client_name] == nil then
+          config.lsp[client_name]:snapshot_settings(client)
+        end
+        config.lsp[client_name]:set_python_path(client, selected)
       end
       M._clients[client_name] = client_id
     end,

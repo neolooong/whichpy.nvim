@@ -36,7 +36,6 @@ M.handle_select = function(selected, should_cache)
   should_cache = should_cache == nil or should_cache
 
   if should_backup_original then
-    _orig_interpreter_path["lsp"] = {}
     _orig_interpreter_path["dap"] = {}
     _orig_interpreter_path["envvar"] = {
       CONDA_PREFIX = vim.env.CONDA_PREFIX,
@@ -49,9 +48,9 @@ M.handle_select = function(selected, should_cache)
     local client = vim.lsp.get_clients({ name = lsp_name })[1]
     if client then
       if should_backup_original then
-        _orig_interpreter_path["lsp"][lsp_name] = handler.get_python_path(client)
+        handler:snapshot_settings(client)
       end
-      handler.set_python_path(client, selected.path)
+      handler:set_python_path(client, selected.path)
     end
   end
 
@@ -121,7 +120,7 @@ M.handle_reset = function()
   for lsp_name, handler in pairs(config.lsp) do
     local client = vim.lsp.get_clients({ name = lsp_name })[1]
     if client then
-      handler.set_python_path(client, orig_interpreter_path.lsp[client])
+      handler:restore_snapshot(client)
     end
   end
 
