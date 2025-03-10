@@ -23,7 +23,9 @@ function M.create_autocmd()
       end
 
       local selected = require("whichpy.envs").current_selected()
-      if next(M._clients) == nil and selected == nil then
+      local selected_explicitly = require("whichpy.envs").current_selected_explicitly()
+      if next(M._clients) == nil and (selected == nil or
+                (config.auto_select_when_current_implicit and not selected_explicitly)) then
         require("whichpy.envs").retrieve_cache()
       elseif M._clients[client_name] ~= client_id and selected ~= nil then
         if M._clients[client_name] == nil then
