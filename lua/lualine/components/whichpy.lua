@@ -14,11 +14,10 @@ function M:update_status()
             icon, _ = devicons.get_icon(vim.fn.expand("%:t"))
         end
 
-        local whichpy_python = require("whichpy.envs").current_selected()
-        if not whichpy_python then
+        local venv = require("whichpy.envs").current_selected_name()
+        if not venv then
             return nil
         end
-        local venv = vim.fs.dirname(vim.fs.dirname(whichpy_python))
 
         ok, plenary = pcall(require, "plenary")
         if ok then
