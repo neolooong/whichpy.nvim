@@ -191,28 +191,22 @@ your lualine config.
 
 eg.
 
-```
-    require("lualine").setup({
-        options = {
-            -- ...
-        },
-        sections = {
-            -- ...
-            lualine_x = {
-                "encoding",
-                "fileformat",
-                {
-                    "filetype",
-                    colored = true, -- Displays filetype icon in color if set to true
-                    icon_only = false, -- Display only an icon for filetype
-                    icon = { "X", align = "right" }, -- Display filetype icon on the right hand side
-                },
-                "whichpy"
-            },
-            -- ...
-        },
-        -- ...
-    })
+```lua
+require("lualine").setup({
+  sections = {
+    lualine_x = {
+      "encoding",
+      "fileformat",
+      {
+        "filetype",
+        colored = true, -- Displays filetype icon in color if set to true
+        icon_only = false, -- Display only an icon for filetype
+        icon = { "X", align = "right" }, -- Display filetype icon on the right hand side
+      },
+      "whichpy"
+    },
+  },
+})
 ```
 
 ## Acknowledgments
