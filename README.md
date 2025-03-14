@@ -184,6 +184,37 @@ This plugin provide these commands:
   Once I'm become more familiar with `fd` and have free time. I'll try.
 </details>
 
+## lualine component
+
+A lualine component is included which shows the current env name.  To use it, simple include `"whichpy"` in
+your lualine config.
+
+eg.
+
+```
+    require("lualine").setup({
+        options = {
+            -- ...
+        },
+        sections = {
+            -- ...
+            lualine_x = {
+                "encoding",
+                "fileformat",
+                {
+                    "filetype",
+                    colored = true, -- Displays filetype icon in color if set to true
+                    icon_only = false, -- Display only an icon for filetype
+                    icon = { "X", align = "right" }, -- Display filetype icon on the right hand side
+                },
+                "whichpy"
+            },
+            -- ...
+        },
+        -- ...
+    })
+```
+
 ## Acknowledgments
 
 - [venv-selector.nvim](https://github.com/linux-cultist/venv-selector.nvim) for inspiring the Python path setup.
