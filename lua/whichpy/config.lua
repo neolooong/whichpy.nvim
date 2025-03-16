@@ -4,6 +4,7 @@
 ---@field lsp? table<string,WhichPy.Lsp.Handler>
 ---@field picker? WhichPy.Config.Picker
 ---@field update_path_env? boolean
+---@field set_env_on_startup? boolean
 ---@field after_handle_select? fun(selected: WhichPy.InterpreterInfo)
 
 ---@class (exact) WhichPy.Config.Locator
