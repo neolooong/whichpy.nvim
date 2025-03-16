@@ -54,6 +54,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
   {
     cache_dir = vim.fn.stdpath("cache") .. "/whichpy.nvim",
     update_path_env = false,  -- Whether to modify $PATH when switching interpreters.
+    set_env_on_startup = false,  -- Whether to select a previous env for pwd on startup.
     after_handle_select = nil,  -- Equivalent to venv-selector.nvim's on_venv_activate_callback()
     -- after_handle_select = function(selected) vim.print(selected) end,
     picker = {
