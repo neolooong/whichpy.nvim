@@ -21,7 +21,7 @@ end
 
 function Locator:find(Job)
   return coroutine.wrap(function()
-    if not vim.fn.executable("conda") then
+    if vim.fn.executable("conda") == 0 then
       return
     end
 

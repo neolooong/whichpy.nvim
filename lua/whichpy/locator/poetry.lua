@@ -19,7 +19,7 @@ end
 
 function Locator:find(Job)
   return coroutine.wrap(function()
-    if not vim.fn.executable("poetry") then
+    if vim.fn.executable("poetry") == 0 then
       return
     end
 
