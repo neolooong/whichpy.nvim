@@ -1,13 +1,13 @@
 local util = require("whichpy.util")
 
 ---@class WhichPy.Picker
----@field setup function
----@field show function
+---@field setup fun(self: WhichPy.Picker): table
+---@field show fun(self: WhichPy.Picker)
 
 local M = {}
 setmetatable(M, {
   __index = function(_, key)
-    if key == "fzf-lua" or key == "telescope" then
+    if key == "fzf-lua" or key == "telescope" or key == "snacks" then
       if util.is_support(key) then
         return require("whichpy.picker." .. key)
       end
