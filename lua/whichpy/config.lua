@@ -26,10 +26,11 @@
 ---@alias WhichPy.Config.Locator.Uv WhichPy.Locator.Opts|WhichPy.Locator.Uv.Opts
 
 ---@class WhichPy.Config.Picker
----@field name? "builtin"|"fzf-lua"|"telescope"
+---@field name? "builtin"|"fzf-lua"|"telescope"|"snacks"
 ---@field builtin? table
----@field fzf-lua? table
+---@field ["fzf-lua"]? table
 ---@field telescope? table
+---@field snacks? table
 
 ---@type WhichPy.Config
 local _default_config = {

@@ -11,7 +11,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
 - Support multiple Lsp servers. (Pylsp, Pyright, BasedPyright)
 - Support nvim-dap-python.
 - Switch between python interpreters without restart LSPs. (Except `WhichPy reset` on Pyright)
-- Support multiple pickers. (`builtin`, `fzf-lua`, `telescope`)
+- Support multiple pickers. (`builtin`, `fzf-lua`, `telescope`, `snacks`)
 - Automatically select the previously chosen interpreter based on the directory.
 - Search on common directories, currently support:
   - workspace (`lsp.WorkspaceFolder` or `vim.fs.root` or `vim.fn.getcwd`)
@@ -40,6 +40,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
     -- optional for picker support
     -- "ibhagwan/fzf-lua",
     -- "nvim-telescope/telescope.nvim",
+    -- "folke/snacks.nvim",
   }
   opts = {},
 }
@@ -57,7 +58,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
     after_handle_select = nil,  -- Equivalent to venv-selector.nvim's on_venv_activate_callback()
     -- after_handle_select = function(selected) vim.print(selected) end,
     picker = {
-      name = "builtin",  -- must be one of ("builtin", "fzf-lua", "telescope")
+      name = "builtin",  -- must be one of ("builtin", "fzf-lua", "telescope", "snacks")
       -- You can customize the picker as follows. For available options, refer to the respective documentation.
       -- ["fzf-lua"] = {
       --   prompt="fzf-lua",
@@ -67,6 +68,9 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
       -- },
       -- builtin = {
       --   prompt="vim.ui.select",
+      -- },
+      -- snacks = {
+      --   prompt="Select Python Interpreter",
       -- },
     },
     locator = {
