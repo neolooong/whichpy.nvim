@@ -10,10 +10,12 @@ M.setup = function(opts)
   -- to ensure notifications etc are set up.
   if vim.v.vim_did_enter == 0 then
     M._augroup = vim.api.nvim_create_augroup("WhichPyStartup", { clear = true })
-    vim.api.nvim_create_autocmd({ "VimEnter" }, {
+    vim.api.nvim_create_autocmd({ "UIEnter" }, {
       group = M._augroup,
       callback = function()
-        require("whichpy.envs").retrieve_cache()
+        vim.defer_fn(function()
+          require("whichpy.envs").retrieve_cache()
+        end, 50)
       end,
     })
   else
