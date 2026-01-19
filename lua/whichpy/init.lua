@@ -15,7 +15,7 @@ M.setup = function(opts)
       callback = function()
         vim.defer_fn(function()
           require("whichpy.envs").retrieve_cache()
-        end, 50)
+        end, 200)
       end,
     })
   else
