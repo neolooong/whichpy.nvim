@@ -38,7 +38,7 @@ function M:set_python_path(client, python_path)
       vim.tbl_deep_extend("force", client.settings, { python = { pythonPath = python_path } })
     client.notify("workspace/didChangeConfiguration", { settings = nil })
   else
-    vim.cmd(("LspRestart %s"):format(client.id))
+    vim.cmd(("LspRestart %s"):format(client.name))
   end
 end
 
