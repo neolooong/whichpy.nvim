@@ -61,7 +61,7 @@ describe("LSP attach behavior", function()
       local current_selected = stub(require("whichpy.envs"), "current_selected")
       local retrieve_cache = stub(require("whichpy.envs"), "retrieve_cache")
       trigger_lsp_attach(1)
-      assert.are.same(1, require("whichpy.lsp")._clients["srv1"])
+      assert.are.same({ client_id = 1 }, require("whichpy.lsp")._clients["srv1"])
       assert.spy(retrieve_cache).was.called(1)
       assert.spy(lsp_handler1.snapshot_settings).was.called(0)
       assert.spy(lsp_handler1.set_python_path).was.called(0)
@@ -117,10 +117,7 @@ describe("LSP attach behavior", function()
       assert.spy(retrieve_cache).was.called(0)
       assert.spy(lsp_handler1.snapshot_settings).was.called(1)
       assert.spy(lsp_handler1.set_python_path).was.called(2)
-      assert.are.same(
-        { "snapshot_settings", "set_python_path", "set_python_path" },
-        lsp_handler1._call_order
-      )
+      assert.are.same({ "snapshot_settings", "set_python_path", "set_python_path" }, lsp_handler1._call_order)
       current_selected:revert()
       retrieve_cache:revert()
     end)
@@ -156,14 +153,27 @@ describe("LSP attach behavior", function()
       assert.spy(lsp_handler2.snapshot_settings).was.called(1)
       assert.spy(lsp_handler1.set_python_path).was.called(2)
       assert.spy(lsp_handler2.set_python_path).was.called(2)
-      assert.are.same(
-        { "snapshot_settings", "set_python_path", "set_python_path" },
-        lsp_handler1._call_order
-      )
-      assert.are.same(
-        { "snapshot_settings", "set_python_path", "set_python_path" },
-        lsp_handler2._call_order
-      )
+      assert.are.same({ "snapshot_settings", "set_python_path", "set_python_path" }, lsp_handler1._call_order)
+      assert.are.same({ "snapshot_settings", "set_python_path", "set_python_path" }, lsp_handler2._call_order)
+      current_selected:revert()
+      retrieve_cache:revert()
+    end)
+  end)
+
+  describe("with skip flag", function()
+    it("should skip reconfiguration if skip_next_set_python_path was called", function()
+      local current_selected = stub(require("whichpy.envs"), "current_selected", "/path/to/python")
+      local retrieve_cache = stub(require("whichpy.envs"), "retrieve_cache")
+
+      require("whichpy.lsp").skip_next_set_python_path(fake_client1)
+      trigger_lsp_attach(1)
+
+      assert.spy(lsp_handler1.set_python_path).was.called(0)
+
+      -- Check if flag is cleared for next attach
+      trigger_lsp_attach(3) -- client 3 is also srv1 but different ID
+      assert.spy(lsp_handler1.set_python_path).was.called(1)
+
       current_selected:revert()
       retrieve_cache:revert()
     end)
