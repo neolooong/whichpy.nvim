@@ -1,6 +1,6 @@
 # whichpy.nvim
 
-Yet another python interpreter selector plugin for neovim. Make LSPs (pyright, pylsp, basedpyright) and DAP work with specific python.
+Yet another python interpreter selector plugin for neovim. Make LSPs (pyright, pylsp, basedpyright, ty) and DAP work with specific python.
 
 
 https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
@@ -8,9 +8,9 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
 
 ## Features
 
-- Support multiple Lsp servers. (Pylsp, Pyright, BasedPyright)
+- Support multiple Lsp servers. (Pylsp, Pyright, BasedPyright, ty)
 - Support nvim-dap-python.
-- Switch between python interpreters without restart LSPs. (Except `WhichPy reset` on Pyright)
+- Switch between python interpreters without restart LSPs. (Except `WhichPy reset` on Pyright and ty)
 - Support multiple pickers. (`builtin`, `fzf-lua`, `telescope`, `snacks`)
 - Automatically select the previously chosen interpreter based on the directory.
 - Search on common directories, currently support:
@@ -128,6 +128,7 @@ https://github.com/user-attachments/assets/bddd568a-947a-49d2-a403-efae2787f60a
       pylsp = require("whichpy.lsp.handlers.pylsp").new(),
       pyright = require("whichpy.lsp.handlers.pyright").new(),
       basedpyright = require("whichpy.lsp.handlers.pyright").new(),
+      ty = require("whichpy.lsp.handlers.ty").new(),
     },
   }
   ```

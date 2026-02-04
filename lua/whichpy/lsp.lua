@@ -1,6 +1,7 @@
 local M = {
   _augroup = {},
   _clients = {},
+  _restart_by_whichpy = {},
 }
 
 function M.lsp_attach_callback(args)
@@ -16,16 +17,43 @@ function M.lsp_attach_callback(args)
     return
   end
 
-  local selected = require("whichpy.envs").current_selected()
-  if next(M._clients) == nil and selected == nil then
-    require("whichpy.envs").retrieve_cache()
-  elseif M._clients[client_name] ~= client_id and selected ~= nil then
-    if M._clients[client_name] == nil then
+  local envs = require("whichpy.envs")
+  local selected = envs.current_selected()
+  local has_selected = selected ~= nil
+
+  if next(M._clients) == nil and not has_selected then
+    envs.retrieve_cache()
+  end
+
+  local client_state = M._clients[client_name]
+  local is_new_client = client_state == nil
+  local is_same_client = not is_new_client and client_state.client_id == client_id
+
+  if not is_same_client and has_selected then
+    if is_new_client then
       config.lsp[client_name]:snapshot_settings(client)
     end
-    config.lsp[client_name]:set_python_path(client, selected)
+
+    if
+      not M._restart_by_whichpy[client.name]
+      and (
+        is_new_client
+        or not is_same_client
+        or (is_same_client and client_state.last_selected ~= selected)
+      )
+    then
+      config.lsp[client_name]:set_python_path(client, selected)
+    end
+
+    if M._restart_by_whichpy[client.name] then
+      M._restart_by_whichpy[client.name] = nil
+    end
   end
-  M._clients[client_name] = client_id
+
+  M._clients[client_name] = {
+    client_id = client_id,
+    last_selected = selected,
+  }
 end
 
 function M.create_autocmd()
@@ -37,4 +65,9 @@ function M.create_autocmd()
   })
 end
 
+function M.skip_next_set_python_path(client)
+  M._restart_by_whichpy[client.name] = true
+end
+
 return M
+

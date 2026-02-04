@@ -50,6 +50,7 @@ local _default_config = {
     pylsp = require("whichpy.lsp.handlers.pylsp").new(),
     pyright = require("whichpy.lsp.handlers.pyright").new(),
     basedpyright = require("whichpy.lsp.handlers.pyright").new(),
+    ty = require("whichpy.lsp.handlers.ty").new(),
   },
   after_handle_select = nil,
 }
