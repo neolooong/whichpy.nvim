@@ -146,7 +146,7 @@ M.handle_reset = function()
   end
 
   -- cache
-  local filename = vim.fn.getcwd():gsub("/", "%%")
+  local filename = vim.fn.getcwd():gsub("[\\/:]+", "%%")
   os.remove(vim.fs.joinpath(config.cache_dir, filename))
 
   orig_interpreter_path = nil
@@ -154,7 +154,7 @@ M.handle_reset = function()
 end
 
 M.retrieve_cache = function()
-  local filename = vim.fn.getcwd():gsub("/", "%%")
+  local filename = vim.fn.getcwd():gsub("[\\/:]+", "%%")
   local f = io.open(vim.fs.joinpath(config.cache_dir, filename), "r")
   if not f then
     return
