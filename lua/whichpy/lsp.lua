@@ -34,14 +34,7 @@ function M.lsp_attach_callback(args)
       config.lsp[client_name]:snapshot_settings(client)
     end
 
-    if
-      not M._restart_by_whichpy[client.name]
-      and (
-        is_new_client
-        or not is_same_client
-        or (is_same_client and client_state.last_selected ~= selected)
-      )
-    then
+    if not M._restart_by_whichpy[client.name] then
       config.lsp[client_name]:set_python_path(client, selected)
     end
 
