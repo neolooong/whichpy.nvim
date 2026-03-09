@@ -98,9 +98,13 @@ M.handle_select = function(selected, should_cache)
   if should_cache then
     vim.fn.mkdir(config.cache_dir, "p")
     local filename = vim.fn.getcwd():gsub("[\\/:]+", "%%")
-    local f = assert(io.open(vim.fs.joinpath(config.cache_dir, filename), "wb"))
-    f:write(selected.path .. "\n" .. selected.locator_name)
-    f:close()
+    local f, err = io.open(vim.fs.joinpath(config.cache_dir, filename), "wb")
+    if f then
+      f:write(selected.path .. "\n" .. selected.locator_name)
+      f:close()
+    else
+      util.notify("Failed to write cache: " .. err, { level = vim.log.levels.WARN })
+    end
   end
 
   if should_backup_original then
