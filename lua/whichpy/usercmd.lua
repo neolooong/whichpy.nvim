@@ -13,7 +13,7 @@ local subcommand_tbl = {
       else
         local python_path = opts.fargs[2]
         if not vim.uv.fs_stat(python_path) then
-          util.notify(python_path .. " doesn't exists.")
+          util.notify(python_path .. " doesn't exist.")
         else
           require("whichpy.envs").handle_select(InterpreterInfo:new({
             locator = require("whichpy.locator").get_locator("global"),
