@@ -165,4 +165,60 @@ function M.get_env_var_strategy.guess(python_path)
   return {}
 end
 
+---@class WhichPy.AsyncFindOpts
+---@field locator table
+---@field Job table
+---@field cmd string[]
+---@field parse_output fun(stdout: string): any?
+---@field err_msg string
+---@field find_fn fun(locator: table, data: any): fun(): WhichPy.InterpreterInfo?
+
+---Shared async find pattern for locators that run an external command.
+---@param opts WhichPy.AsyncFindOpts
+function M.async_find(opts)
+  return coroutine.wrap(function()
+    if vim.fn.executable(opts.cmd[1]) == 0 then
+      return
+    end
+
+    vim.system(opts.cmd, {}, function(out)
+      local ctx = { locator_name = opts.locator.name }
+
+      if out.code ~= 0 then
+        ctx.err = opts.err_msg
+      else
+        local data = opts.parse_output(out.stdout)
+        if data then
+          ctx.co = function()
+            return opts.find_fn(opts.locator, data)
+          end
+        end
+      end
+
+      opts.Job:continue(ctx)
+    end)
+
+    coroutine.yield({ locator_name = opts.locator.name, wait = true })
+  end)
+end
+
+local get_interpreter_path = util.get_interpreter_path
+local InterpreterInfo = require("whichpy.locator").InterpreterInfo
+
+---Shared _find for locators that scan a directory for subdirectories containing a Python interpreter.
+---@param locator table
+---@param dir string
+function M.find_interpreters_in_dir(locator, dir)
+  return coroutine.wrap(function()
+    for name, t in vim.fs.dir(dir) do
+      if t == "directory" then
+        local path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
+        if vim.uv.fs_stat(path) then
+          coroutine.yield(InterpreterInfo:new({ locator = locator, path = path }))
+        end
+      end
+    end
+  end)
+end
+
 return M

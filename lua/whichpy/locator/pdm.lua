@@ -1,6 +1,5 @@
-local get_interpreter_path = require("whichpy.util").get_interpreter_path
-local get_env_var_strategy = require("whichpy.locator._common").get_env_var_strategy
-local InterpreterInfo = require("whichpy.locator").InterpreterInfo
+local common = require("whichpy.locator._common")
+local get_env_var_strategy = common.get_env_var_strategy
 
 ---@class WhichPy.Locator.Pdm: WhichPy.Locator
 
@@ -18,43 +17,17 @@ function Locator.new(opts)
 end
 
 function Locator:find(Job)
-  return coroutine.wrap(function()
-    if vim.fn.executable("pdm") == 0 then
-      return
-    end
-
-    vim.system({ "pdm", "config", "venv.location" }, {}, function(out)
-      local ctx = { locator_name = self.name }
-
-      if out.code ~= 0 then
-        ctx.err = "pdm command error"
-      else
-        local dir = vim.trim(out.stdout)
-        if dir ~= "" then
-          ctx.co = function()
-            return self:_find(dir)
-          end
-        end
-      end
-
-      Job:continue(ctx)
-    end)
-
-    coroutine.yield({ locator_name = self.name, wait = true })
-  end)
-end
-
-function Locator:_find(dir)
-  return coroutine.wrap(function()
-    for name, t in vim.fs.dir(dir) do
-      if t == "directory" then
-        local path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")
-        if vim.uv.fs_stat(path) then
-          coroutine.yield(InterpreterInfo:new({ locator = self, path = path }))
-        end
-      end
-    end
-  end)
+  return common.async_find({
+    locator = self,
+    Job = Job,
+    cmd = { "pdm", "config", "venv.location" },
+    parse_output = function(stdout)
+      local dir = vim.trim(stdout)
+      return dir ~= "" and dir or nil
+    end,
+    err_msg = "pdm command error",
+    find_fn = common.find_interpreters_in_dir,
+  })
 end
 
 return Locator
