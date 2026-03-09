@@ -65,8 +65,7 @@ function M.get_search_path_entries()
   dirs = vim
     .iter(dirs)
     :filter(function(dir)
-      return dir ~= pyenv_shims
-        and (exclude_path == nil or exclude_path ~= nil and dir ~= exclude_path)
+      return dir ~= pyenv_shims and (exclude_path == nil or dir ~= exclude_path)
     end)
     :map(function(dir)
       return vim.fn.fnamemodify(dir, ":p")
