@@ -180,7 +180,7 @@ function M.async_find(opts)
       return
     end
 
-    vim.system(opts.cmd, {}, function(out)
+    vim.system(opts.cmd, { timeout = 10000 }, function(out)
       local ctx = { locator_name = opts.locator.name }
 
       if out.code ~= 0 then
