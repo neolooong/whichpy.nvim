@@ -20,7 +20,7 @@ M.notify = function(msg, opts)
     notify_func = vim.notify_once
     opts.once = nil
   end
-  if not opts.level then
+  if opts.level then
     level = opts.level
     opts.level = nil
   end
