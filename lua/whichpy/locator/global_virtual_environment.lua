@@ -16,7 +16,7 @@ Locator.__index = Locator
 
 function Locator.new(opts)
   local obj = vim.tbl_deep_extend("force", {
-    display_name = "Global Virtual Environemnt",
+    display_name = "Global Virtual Environment",
     get_env_var_strategy = get_env_var_strategy.virtual_env,
     dirs = {
       "~/envs",

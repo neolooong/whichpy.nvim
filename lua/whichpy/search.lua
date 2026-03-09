@@ -20,7 +20,7 @@ function SearchJob:status()
 end
 
 function SearchJob:start()
-  if self.co ~= nil and self.status(self) ~= "dead" then
+  if self.co ~= nil and self:status() ~= "dead" then
     return
   end
 
