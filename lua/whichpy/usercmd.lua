@@ -23,6 +23,10 @@ local subcommand_tbl = {
       end
     end,
     complete = function(subcmd_arg_lead)
+      local SearchJob = require("whichpy.search")
+      if SearchJob:status() == nil then
+        SearchJob:start()
+      end
       local envs = require("whichpy.envs").get_envs()
       if #envs == 0 then
         return {}
@@ -30,7 +34,7 @@ local subcommand_tbl = {
       envs = vim
         .iter(envs)
         :map(function(env)
-          return env.interpreter_path
+          return env.path
         end)
         :filter(function(env)
           return env:find(subcmd_arg_lead)
