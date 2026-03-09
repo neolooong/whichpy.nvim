@@ -35,10 +35,9 @@ function Locator:find()
 
           local envs_dir = vim.fs.joinpath(dir, name, "envs")
 
-          ---@diagnostic disable-next-line: redefined-local
-          for name, t in vim.fs.dir(envs_dir) do
-            if t == "directory" then
-              path = get_interpreter_path(vim.fs.joinpath(envs_dir, name), "bin")
+          for venv_name, venv_type in vim.fs.dir(envs_dir) do
+            if venv_type == "directory" then
+              path = get_interpreter_path(vim.fs.joinpath(envs_dir, venv_name), "bin")
               if vim.uv.fs_stat(path) then
                 coroutine.yield(InterpreterInfo:new({ locator = self, path = path }))
               end
