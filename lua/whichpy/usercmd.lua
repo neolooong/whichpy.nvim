@@ -79,6 +79,7 @@ local function main_cmd(opts)
   local subcommand = subcommand_tbl[subcommand_key]
   if not subcommand then
     vim.notify("WhichPy: Unknown command: " .. subcommand_key, vim.log.levels.ERROR)
+    return
   end
 
   subcommand.impl(opts)
