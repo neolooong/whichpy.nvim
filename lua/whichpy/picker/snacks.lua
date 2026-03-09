@@ -6,18 +6,14 @@ local get_envs = require("whichpy.envs").get_envs
 local Picker = {}
 
 function Picker:setup()
-  return vim.tbl_deep_extend(
-    "force",
-    {
-      prompt = " ",
-      title = "Select Python Interpreter",
-      format = "text",
-      layout = {
-          hidden = { "preview" },
-      }
+  return vim.tbl_deep_extend("force", {
+    prompt = " ",
+    title = "Select Python Interpreter",
+    format = "text",
+    layout = {
+      hidden = { "preview" },
     },
-    config.picker["snacks"] or {}
-  )
+  }, config.picker["snacks"] or {})
 end
 
 function Picker:show()

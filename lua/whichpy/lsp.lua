@@ -63,4 +63,3 @@ function M.skip_next_set_python_path(client)
 end
 
 return M
-
