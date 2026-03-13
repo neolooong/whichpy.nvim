@@ -1,9 +1,17 @@
+---@class WhichPy.Lsp.ClientState
+---@field client_id integer
+---@field last_selected string?
+
 local M = {
-  _augroup = {},
+  ---@type integer
+  _augroup = 0,
+  ---@type table<string, WhichPy.Lsp.ClientState>
   _clients = {},
+  ---@type table<string, boolean>
   _restart_by_whichpy = {},
 }
 
+---@param args { data: { client_id: integer } }
 function M.lsp_attach_callback(args)
   local client_id = args["data"]["client_id"]
   local client = vim.lsp.get_client_by_id(client_id)
@@ -29,7 +37,7 @@ function M.lsp_attach_callback(args)
   local is_new_client = client_state == nil
   local is_same_client = not is_new_client and client_state.client_id == client_id
 
-  if not is_same_client and has_selected then
+  if not is_same_client and selected then
     if is_new_client then
       config.lsp[client_name]:snapshot_settings(client)
     end
@@ -58,6 +66,7 @@ function M.create_autocmd()
   })
 end
 
+---@param client vim.lsp.Client
 function M.skip_next_set_python_path(client)
   M._restart_by_whichpy[client.name] = true
 end

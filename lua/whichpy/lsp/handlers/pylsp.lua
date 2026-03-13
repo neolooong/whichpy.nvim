@@ -1,9 +1,10 @@
 ---@class WhichPy.Lsp.PylspHandler: WhichPy.Lsp.Handler
----@field snapshot? table
----@field server_default? table
+---@field snapshot? { jedi_environment: string?, mypy_overrides: any[] }
+---@field server_default { jedi_environment: string?, mypy_overrides: any[] }
 local M = {}
 M.__index = M
 
+---@return WhichPy.Lsp.PylspHandler
 function M.new()
   local obj = {
     server_default = {

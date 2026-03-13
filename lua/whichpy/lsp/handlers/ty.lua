@@ -1,9 +1,8 @@
 ---@class WhichPy.Lsp.TyHandler: WhichPy.Lsp.Handler
----@field snapshot? table
----@field server_default? table
 local M = {}
 M.__index = M
 
+---@return WhichPy.Lsp.TyHandler
 function M.new()
   return setmetatable({}, M)
 end

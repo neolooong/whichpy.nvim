@@ -2,11 +2,16 @@
 ---@field locator_name string
 ---@field wait? boolean
 ---@field err? string
----@field co? thread
+---@field co? fun(): fun(): WhichPy.InterpreterInfo?
 
 local util = require("whichpy.util")
 local locators = require("whichpy.locator").locators
 
+---@class WhichPy.SearchJob
+---@field co thread?
+---@field _temp_envs WhichPy.InterpreterInfo[]
+---@field on_result fun(info: WhichPy.InterpreterInfo)
+---@field on_finish fun()
 local SearchJob = {
   co = nil,
   _temp_envs = {},
@@ -36,6 +41,7 @@ function SearchJob:start()
         if ctx.wait then
           wait_group[ctx.locator_name] = true
         else
+          ---@cast ctx WhichPy.InterpreterInfo
           table.insert(self._temp_envs, ctx)
           if self.on_result then
             self.on_result(ctx)
@@ -70,6 +76,8 @@ function SearchJob:start()
   end)()
 end
 
+---@param on_result? fun(info: WhichPy.InterpreterInfo)
+---@param on_finish? fun()
 function SearchJob:update_hook(on_result, on_finish)
   self.on_result = on_result or function(_) end
   self.on_finish = on_finish or function() end

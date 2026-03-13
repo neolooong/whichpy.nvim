@@ -14,6 +14,8 @@ local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 local Locator = { name = "global_virtual_environment" }
 Locator.__index = Locator
 
+---@param opts? WhichPy.Locator.GlobalVirtualEnvironment.Opts
+---@return WhichPy.Locator.GlobalVirtualEnvironment
 function Locator.new(opts)
   local obj = vim.tbl_deep_extend("force", {
     display_name = "Global Virtual Environment",
@@ -31,6 +33,7 @@ function Locator.new(opts)
   return setmetatable(obj, Locator)
 end
 
+---@return fun(): WhichPy.InterpreterInfo?
 function Locator:find()
   return coroutine.wrap(function()
     local dirs = get_global_virtual_environment_dirs(self.dirs)

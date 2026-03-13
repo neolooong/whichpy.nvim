@@ -1,4 +1,4 @@
-.PHONY: test test_deps format format-check
+.PHONY: test test_deps format format-check lua-check
 
 test_deps:
 ifeq (,$(wildcard test_deps/plenary.nvim))
@@ -13,3 +13,9 @@ format:
 
 format-check:
 	stylua --check lua/
+
+LUA_LS ?= lua-language-server
+
+lua-check:
+	VIMRUNTIME=$$(nvim --clean --headless -c 'echo $$VIMRUNTIME' -c 'qa' 2>&1) \
+	  $(LUA_LS) --check . --checklevel=Warning

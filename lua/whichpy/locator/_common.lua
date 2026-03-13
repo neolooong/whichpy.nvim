@@ -4,6 +4,7 @@ local config = require("whichpy.config").config
 
 local M = {}
 
+---@return string
 function M.get_pyenv_dir()
   local pyenv_root = is_win and os.getenv("PYENV") or os.getenv("PYENV_ROOT")
   if pyenv_root == nil or pyenv_root == "" then
@@ -14,10 +15,12 @@ function M.get_pyenv_dir()
   return pyenv_root
 end
 
+---@return string
 function M.get_pyenv_version_dir()
   return vim.fs.joinpath(M.get_pyenv_dir(), "versions")
 end
 
+---@return string
 function M.get_pyenv_shims_dir()
   return vim.fs.joinpath(M.get_pyenv_dir(), "shims")
 end
@@ -48,6 +51,7 @@ local common_posix_bin_paths = {
   "~/.local/bin",
 }
 
+---@return string[]
 function M.get_search_path_entries()
   local delimiter = (is_win and ";") or ":"
   local dirs = vim.split(vim.env.PATH or vim.env.Path, delimiter)
@@ -74,6 +78,8 @@ function M.get_search_path_entries()
   return util.deduplicate(dirs)
 end
 
+---@param opts_dirs (string|string[])[]
+---@return string[]
 function M.get_global_virtual_environment_dirs(opts_dirs)
   local sysname = vim.uv.os_uname().sysname
   local dirs = {}
@@ -90,6 +96,7 @@ function M.get_global_virtual_environment_dirs(opts_dirs)
   return util.deduplicate(dirs)
 end
 
+---@return string[]
 function M.get_workspace_folders()
   local hash = {}
   local res = {}
@@ -111,12 +118,16 @@ function M.get_workspace_folders()
   return res
 end
 
+---@type table<string, fun(python_path?: string): WhichPy.EnvVar>
 M.get_env_var_strategy = {}
 
+---@return WhichPy.EnvVar
 function M.get_env_var_strategy.no()
   return {}
 end
 
+---@param python_path string
+---@return WhichPy.EnvVar
 function M.get_env_var_strategy.conda(python_path)
   local prefix = vim.fs.dirname(python_path)
   if not is_win then
@@ -125,6 +136,8 @@ function M.get_env_var_strategy.conda(python_path)
   return { name = "CONDA_PREFIX", val = prefix }
 end
 
+---@param python_path string
+---@return WhichPy.EnvVar
 function M.get_env_var_strategy.pyenv(python_path)
   local venv = vim.fs.dirname(vim.fs.dirname(python_path))
   local pyvenv_cfg = vim.fs.joinpath(venv, "pyvenv.cfg")
@@ -134,10 +147,14 @@ function M.get_env_var_strategy.pyenv(python_path)
   return {}
 end
 
+---@param python_path string
+---@return WhichPy.EnvVar
 function M.get_env_var_strategy.virtual_env(python_path)
   return { name = "VIRTUAL_ENV", val = vim.fs.dirname(vim.fs.dirname(python_path)) }
 end
 
+---@param python_path string
+---@return WhichPy.EnvVar
 function M.get_env_var_strategy.guess(python_path)
   local venv = vim.fs.dirname(vim.fs.dirname(python_path))
   if vim.startswith(python_path, M.get_pyenv_version_dir()) then
@@ -165,15 +182,16 @@ function M.get_env_var_strategy.guess(python_path)
 end
 
 ---@class WhichPy.AsyncFindOpts
----@field locator table
----@field Job table
+---@field locator WhichPy.Locator
+---@field Job WhichPy.SearchJob
 ---@field cmd string[]
 ---@field parse_output fun(stdout: string): any?
 ---@field err_msg string
----@field find_fn fun(locator: table, data: any): fun(): WhichPy.InterpreterInfo?
+---@field find_fn fun(locator: WhichPy.Locator, data: any): fun(): WhichPy.InterpreterInfo?
 
 ---Shared async find pattern for locators that run an external command.
 ---@param opts WhichPy.AsyncFindOpts
+---@return fun(): WhichPy.Ctx|WhichPy.InterpreterInfo
 function M.async_find(opts)
   return coroutine.wrap(function()
     if vim.fn.executable(opts.cmd[1]) == 0 then
@@ -205,8 +223,9 @@ local get_interpreter_path = util.get_interpreter_path
 local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
 ---Shared _find for locators that scan a directory for subdirectories containing a Python interpreter.
----@param locator table
+---@param locator WhichPy.Locator
 ---@param dir string
+---@return fun(): WhichPy.InterpreterInfo?
 function M.find_interpreters_in_dir(locator, dir)
   return coroutine.wrap(function()
     for name, t in vim.fs.dir(dir) do

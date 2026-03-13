@@ -12,6 +12,8 @@ local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 local Locator = { name = "conda" }
 Locator.__index = Locator
 
+---@param opts? WhichPy.Locator.Conda.Opts
+---@return WhichPy.Locator.Conda
 function Locator.new(opts)
   local obj = vim.tbl_deep_extend("force", {
     display_name = "Conda",
@@ -20,6 +22,8 @@ function Locator.new(opts)
   return setmetatable(obj, Locator)
 end
 
+---@param Job WhichPy.SearchJob
+---@return fun(): WhichPy.Ctx|WhichPy.InterpreterInfo
 function Locator:find(Job)
   return common.async_find({
     locator = self,

@@ -1,13 +1,18 @@
 local config = require("whichpy.config").config
 
+---@class WhichPy.EnvVar
+---@field name? string
+---@field val? string
+
 ---@class WhichPy.Locator
----@field private name string
+---@field name string
 ---@field display_name string
----@field get_env_var_strategy fun(path: string): table<string,string>
+---@field get_env_var_strategy fun(path: string): WhichPy.EnvVar
 
 ---@class WhichPy.Locator.Opts
+---@field enable? boolean
 ---@field display_name? string
----@field get_env_var_strategy? fun(path: string): table<string,string>
+---@field get_env_var_strategy? fun(path: string): WhichPy.EnvVar
 
 local M = {}
 
@@ -15,7 +20,7 @@ local M = {}
 M.locators = {}
 
 ---@param locator_name string
----@param locator_opts table
+---@param locator_opts WhichPy.Locator.Opts
 M.setup_locator = function(locator_name, locator_opts)
   if locator_opts.enable == false then
     return
@@ -29,6 +34,8 @@ M.setup_locator = function(locator_name, locator_opts)
   M.locators[locator_name] = locator.new(locator_opts)
 end
 
+---@param locator_name string
+---@return WhichPy.Locator?
 function M.get_locator(locator_name)
   local ok, locator = pcall(require, "whichpy.locator." .. locator_name)
   if not ok then
@@ -40,12 +47,16 @@ function M.get_locator(locator_name)
 end
 
 ---@class WhichPy.InterpreterInfo
----@field locator_name WhichPy.Locator
+---@field locator_name string
 ---@field path string
----@field env_var table<string,string>
+---@field env_var WhichPy.EnvVar
 M.InterpreterInfo = {}
 
----@param opts any
+---@class WhichPy.InterpreterInfo.NewOpts
+---@field locator WhichPy.Locator
+---@field path string
+
+---@param opts WhichPy.InterpreterInfo.NewOpts
 ---@return WhichPy.InterpreterInfo
 function M.InterpreterInfo:new(opts)
   return setmetatable({

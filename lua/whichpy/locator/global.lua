@@ -11,6 +11,8 @@ local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 local Locator = { name = "global" }
 Locator.__index = Locator
 
+---@param opts? WhichPy.Locator.Global.Opts
+---@return WhichPy.Locator.Global
 function Locator.new(opts)
   local obj = vim.tbl_deep_extend("force", {
     display_name = "Global",
@@ -19,6 +21,7 @@ function Locator.new(opts)
   return setmetatable(obj, Locator)
 end
 
+---@return fun(): WhichPy.InterpreterInfo?
 function Locator:find()
   return coroutine.wrap(function()
     local dirs = get_search_path_entries()

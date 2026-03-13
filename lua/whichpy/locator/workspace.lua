@@ -16,6 +16,8 @@ local get_workspace_folders = require("whichpy.locator._common").get_workspace_f
 local Locator = { name = "workspace" }
 Locator.__index = Locator
 
+---@param opts? WhichPy.Locator.Workspace.Opts
+---@return WhichPy.Locator.Workspace
 function Locator.new(opts)
   local obj = vim.tbl_deep_extend("force", {
     display_name = "Workspace",
@@ -34,6 +36,7 @@ function Locator.new(opts)
   return setmetatable(obj, Locator)
 end
 
+---@return fun(): WhichPy.InterpreterInfo?
 function Locator:find()
   local dirs = vim
     .iter(get_workspace_folders())

@@ -12,6 +12,8 @@ local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 local Locator = { name = "pyenv" }
 Locator.__index = Locator
 
+---@param opts? WhichPy.Locator.Pyenv.Opts
+---@return WhichPy.Locator.Pyenv
 function Locator.new(opts)
   local obj = vim.tbl_deep_extend("force", {
     display_name = "Pyenv",
@@ -21,6 +23,7 @@ function Locator.new(opts)
   return setmetatable(obj, Locator)
 end
 
+---@return fun(): WhichPy.InterpreterInfo?
 function Locator:find()
   return coroutine.wrap(function()
     local dir = get_pyenv_version_dir()
