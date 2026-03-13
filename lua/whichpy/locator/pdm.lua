@@ -8,6 +8,8 @@ local get_env_var_strategy = common.get_env_var_strategy
 local Locator = { name = "pdm" }
 Locator.__index = Locator
 
+---@param opts? WhichPy.Locator.Pdm.Opts
+---@return WhichPy.Locator.Pdm
 function Locator.new(opts)
   local obj = vim.tbl_deep_extend("force", {
     display_name = "PDM",
@@ -16,6 +18,8 @@ function Locator.new(opts)
   return setmetatable(obj, Locator)
 end
 
+---@param Job WhichPy.SearchJob
+---@return fun(): WhichPy.Ctx|WhichPy.InterpreterInfo
 function Locator:find(Job)
   return common.async_find({
     locator = self,

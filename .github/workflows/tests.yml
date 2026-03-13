@@ -18,6 +18,31 @@ jobs:
           version: latest
           args: --check lua/
 
+  lua-check:
+    name: Lua diagnostics
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        neovim_version: ['nightly', 'v0.10.4', 'v0.11.0']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: ${{ matrix.neovim_version }}
+
+      - name: Install lua-language-server
+        run: |
+          LUA_LS_VERSION="3.13.6"
+          mkdir -p "$HOME/lua-language-server"
+          curl -fsSL "https://github.com/LuaLS/lua-language-server/releases/download/${LUA_LS_VERSION}/lua-language-server-${LUA_LS_VERSION}-linux-x64.tar.gz" \
+            | tar xz -C "$HOME/lua-language-server"
+          echo "$HOME/lua-language-server/bin" >> "$GITHUB_PATH"
+
+      - name: Run lua-language-server check
+        run: make lua-check
+
   tests:
     name: Run tests
     runs-on: ubuntu-latest

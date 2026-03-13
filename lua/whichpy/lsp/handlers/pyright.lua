@@ -1,9 +1,10 @@
 ---@class WhichPy.Lsp.PyrightHandler: WhichPy.Lsp.Handler
----@field snapshot? table
----@field server_default? table
+---@field snapshot? { python_path: string? }
+---@field server_default { python_path: string? }
 local M = {}
 M.__index = M
 
+---@return WhichPy.Lsp.PyrightHandler
 function M.new()
   local obj = {
     server_default = {

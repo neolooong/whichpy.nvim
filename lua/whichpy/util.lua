@@ -27,6 +27,9 @@ M.notify = function(msg, opts)
   notify_func(msg, level, opts)
 end
 
+---@generic T
+---@param tbl T[]
+---@return T[]
 M.deduplicate = function(tbl)
   local hash = {}
   local unique_tbl = {}
@@ -47,6 +50,7 @@ M.get_interpreter_path = function(dir, case)
 end
 
 ---@param plugin "fzf-lua"|"telescope"|"snacks"
+---@return boolean
 M.is_support = function(plugin)
   return pcall(require, plugin)
 end

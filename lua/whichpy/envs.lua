@@ -2,9 +2,13 @@ local config = require("whichpy.config").config
 local util = require("whichpy.util")
 local is_win = util.is_win
 local SearchJob = require("whichpy.search")
+---@type WhichPy.InterpreterInfo[]
 local final_envs = {}
+---@type table?
 local orig_interpreter_path
+---@type string?
 local curr_interpreter_path
+---@type string?
 local env_name = nil
 local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 
@@ -14,10 +18,12 @@ M.asearch = function()
   SearchJob:start()
 end
 
+---@param envs WhichPy.InterpreterInfo[]
 M.set_envs = function(envs)
   final_envs = envs
 end
 
+---@return WhichPy.InterpreterInfo[]
 M.get_envs = function()
   if SearchJob:status() == "dead" then
     return final_envs
@@ -171,19 +177,25 @@ M.retrieve_cache = function()
   end
   f:close()
 
+  local locator = require("whichpy.locator").get_locator(lines[2] or "global")
+  if not locator then
+    return
+  end
   M.handle_select(
     InterpreterInfo:new({
-      locator = require("whichpy.locator").get_locator(lines[2] or "global"),
+      locator = locator,
       path = lines[1],
     }),
     false
   )
 end
 
+---@return string?
 M.current_selected = function()
   return curr_interpreter_path
 end
 
+---@return string?
 M.current_selected_name = function()
   return env_name
 end
