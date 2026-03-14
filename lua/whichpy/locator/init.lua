@@ -8,6 +8,7 @@ local config = require("whichpy.config").config
 ---@field name string
 ---@field display_name string
 ---@field get_env_var_strategy fun(path: string): WhichPy.EnvVar
+---@field find fun(self: WhichPy.Locator, Job: WhichPy.SearchJob): fun(): WhichPy.Ctx|WhichPy.InterpreterInfo
 
 ---@class WhichPy.Locator.Opts
 ---@field enable? boolean
