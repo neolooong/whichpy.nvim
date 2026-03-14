@@ -228,6 +228,9 @@ local InterpreterInfo = require("whichpy.locator").InterpreterInfo
 ---@return fun(): WhichPy.InterpreterInfo?
 function M.find_interpreters_in_dir(locator, dir)
   return coroutine.wrap(function()
+    if not vim.uv.fs_stat(dir) then
+      return
+    end
     for name, t in vim.fs.dir(dir) do
       if t == "directory" then
         local path = get_interpreter_path(vim.fs.joinpath(dir, name), "bin")

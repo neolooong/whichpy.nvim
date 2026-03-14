@@ -139,6 +139,12 @@ describe("_common find_interpreters_in_dir", function()
     assert.are.equal(0, #results)
   end)
 
+  it("should return empty for non-existent directory", function()
+    mock_fs.setup({})
+    local results = collect(common.find_interpreters_in_dir(fake_locator, "/nonexistent"))
+    assert.are.equal(0, #results)
+  end)
+
   it("should skip subdirectories without python binary", function()
     mock_fs.setup({
       ["/venvs"] = {
