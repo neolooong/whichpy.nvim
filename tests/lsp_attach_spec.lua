@@ -117,7 +117,10 @@ describe("LSP attach behavior", function()
       assert.spy(retrieve_cache).was.called(0)
       assert.spy(lsp_handler1.snapshot_settings).was.called(1)
       assert.spy(lsp_handler1.set_python_path).was.called(2)
-      assert.are.same({ "snapshot_settings", "set_python_path", "set_python_path" }, lsp_handler1._call_order)
+      assert.are.same(
+        { "snapshot_settings", "set_python_path", "set_python_path" },
+        lsp_handler1._call_order
+      )
       current_selected:revert()
       retrieve_cache:revert()
     end)
@@ -153,8 +156,14 @@ describe("LSP attach behavior", function()
       assert.spy(lsp_handler2.snapshot_settings).was.called(1)
       assert.spy(lsp_handler1.set_python_path).was.called(2)
       assert.spy(lsp_handler2.set_python_path).was.called(2)
-      assert.are.same({ "snapshot_settings", "set_python_path", "set_python_path" }, lsp_handler1._call_order)
-      assert.are.same({ "snapshot_settings", "set_python_path", "set_python_path" }, lsp_handler2._call_order)
+      assert.are.same(
+        { "snapshot_settings", "set_python_path", "set_python_path" },
+        lsp_handler1._call_order
+      )
+      assert.are.same(
+        { "snapshot_settings", "set_python_path", "set_python_path" },
+        lsp_handler2._call_order
+      )
       current_selected:revert()
       retrieve_cache:revert()
     end)
