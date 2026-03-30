@@ -18,7 +18,7 @@ end
 function M:set_python_path(client, _)
   vim.defer_fn(function()
     require("whichpy.lsp").skip_next_set_python_path(client)
-    vim.cmd(("LspRestart %s"):format(client.name))
+    vim.cmd(("lsp restart %s"):format(client.name))
   end, 200)
 end
 
