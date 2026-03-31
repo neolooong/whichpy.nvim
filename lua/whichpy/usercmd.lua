@@ -65,6 +65,15 @@ local subcommand_tbl = {
       end
     end,
   },
+  selectcwd = {
+    impl = function(opts)
+      if #opts.fargs > 1 then
+        vim.notify("Too many arguments", vim.log.levels.ERROR)
+      else
+        require("whichpy.envs").retrieve_cache()
+      end
+    end,
+  },
 }
 
 local function main_cmd(opts)
