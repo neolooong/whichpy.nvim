@@ -84,7 +84,11 @@ function M:set_python_path(client, python_path)
     client.settings.pylsp.plugins.jedi.environment = self.snapshot.jedi_environment
     client.settings.pylsp.plugins.pylsp_mypy.overrides = self.snapshot.mypy_overrides
   end
-  client.notify("workspace/didChangeConfiguration", { settings = client.settings })
+  if vim.fn.has("nvim-0.11") == 1 then
+    client:notify("workspace/didChangeConfiguration", { settings = client.settings })
+  else
+    client.notify("workspace/didChangeConfiguration", { settings = client.settings })
+  end
 end
 
 return M

@@ -37,7 +37,11 @@ function M:set_python_path(client, python_path)
   if python_path then
     client.settings =
       vim.tbl_deep_extend("force", client.settings, { python = { pythonPath = python_path } })
-    client.notify("workspace/didChangeConfiguration", { settings = nil })
+    if vim.fn.has("nvim-0.11") == 1 then
+      client:notify("workspace/didChangeConfiguration", { settings = nil })
+    else
+      client.notify("workspace/didChangeConfiguration", { settings = nil })
+    end
   else
     vim.cmd(("LspRestart %s"):format(client.name))
   end
